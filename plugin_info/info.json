@@ -1,0 +1,8 @@
+{
+	"id" : "clientSIP",
+	"name" : "Jeedom repond sur votre reseau SIP",
+	"licence" : "AGPL",
+	"author" : "Halbout Michael",
+	"require" : "3.0",
+	"category" : "automation protocol"
+}
