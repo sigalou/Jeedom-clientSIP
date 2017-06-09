@@ -1,1 +1,0 @@
-# Jeedom-clientSIP
