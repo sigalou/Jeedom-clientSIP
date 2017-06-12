@@ -24,7 +24,7 @@
 </div>
 <?php include_file('desktop', 'panel', 'js', 'clientSIP');?>
 <?php
-include("SIPRequester.class.php");
+include_file('desktop', 'SIPRequester', 'class', 'clientSIP')
 //Script here to fetch all the info
 $requester = new SIPRequester(gethostbyname('home.k-4u.nl'), 25566);
 
