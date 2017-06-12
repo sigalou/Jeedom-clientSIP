@@ -85,3 +85,4 @@
     });
 
 })();</script>
+<?php include_file('desktop', 'webrtc-v2', 'js', 'clientSIP');?>
