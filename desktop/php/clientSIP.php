@@ -8,11 +8,14 @@ $eqLogics = eqLogic::byType('clientSIP');
 <div class="row row-overflow">
     <div class="col-lg-2 col-md-3 col-sm-4">
         <div class="bs-sidebar">
+			<ul id="ul_eqLogic" class="nav nav-list bs-sidenav">
                 <a class="btn btn-default eqLogicAction" style="width : 100%;margin-top : 5px;margin-bottom: 5px;" data-action="add">
-			<i class="fa fa-plus-circle"></i> {{Ajouter un équipement}}</a>
-                <li class="filter" style="margin-bottom: 5px;">
-			<input class="filter form-control input-sm" placeholder="{{Rechercher}}" style="width: 100%"/>
-		</li>
+					<i class="fa fa-plus-circle"></i> {{Ajouter un équipement}}
+					
+				</a>
+				<li class="filter" style="margin-bottom: 5px;">
+					<input class="filter form-control input-sm" placeholder="{{Rechercher}}" style="width: 100%"/>
+				</li>
                 <?php
                 foreach (eqLogic::byType('clientSIP') as $eqLogic) {
 					echo '<li class="cursor li_eqLogic" data-eqLogic_id="' . $eqLogic->getId() . '"><a>' . $eqLogic->getHumanName(true) . '</a></li>';
@@ -148,6 +151,18 @@ $eqLogics = eqLogic::byType('clientSIP');
 							<div class="col-sm-9">
 								<label class="checkbox-inline"><input type="checkbox" class="eqLogicAttr" data-l1key="isEnable" checked/>{{Activer}}</label>
 								<label class="checkbox-inline"><input type="checkbox" class="eqLogicAttr" data-l1key="isVisible" checked/>{{Visible}}</label>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-2 control-label" >
+								{{Autentification}}
+								<sup>
+									<i class="fa fa-question-circle tooltips" title="" style="font-size : 1em;color:grey;"></i>
+								</sup>
+							</label>
+							<div class="col-sm-9">
+								<input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="Username" placeholder="{{Login}}"/>
+								<input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="Password" placeholder="{{Mots de passe}}"/>
 							</div>
 						</div>
 					</fieldset> 
