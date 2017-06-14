@@ -63,7 +63,7 @@ if (init('object_id') == '') {
 		echo $clientSIP->toHtml('dview');
 	}
 	foreach ($child_object as $child) {
-		$cameras = $child->getEqLogic(true, false, 'clientSIP');
+		$clientSIPs = $child->getEqLogic(true, false, 'clientSIP');
 		if (count($clientSIPs) > 0) {
 			foreach ($clientSIPs as $clientSIP) {
 				echo $clientSIP->toHtml();
