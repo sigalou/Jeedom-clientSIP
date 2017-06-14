@@ -8,6 +8,24 @@ class clientSIP extends eqLogic {
 	}
 	public function postSave() {		
 	}	
+	public function toHtml($_version = 'mobile',$Dialog=true) {
+		$User["User"]=$this->getConfiguration("Username");
+		$User["Pass"]=$this->getConfiguration("Password");
+		$User["Realm"]="sip.".config::byKey('Host', 'clientSIP');
+		$User["Display"]=$this->getName();
+		$User["WSServer"]="wss://wss.".config::byKey('Host', 'clientSIP').":"config::byKey('Port', 'clientSIP');
+		$_version = jeedom::versionAlias($_version);
+		$replace = array(
+			'#id#' => $this->getId(),
+			'#name#' => ($this->getIsEnable()) ? $this->getName() : '<del>' . $this->getName() . '</del>',
+			'#eqLink#' => $this->getLinkToConfiguration(),
+			'#background#' => $this->getBackgroundColor($_version),				
+			'#height#' => $this->getDisplay('height', 'auto'),
+			'#width#' => $this->getDisplay('width', '250'),
+			'#User#' => json_encode($User)
+		);	
+		return template_replace($replace, getTemplate('core', $_version, 'eqLogic','clientSIP'));
+	}
 	private function ConnectSip(){
 		try{
 			$Host=config::byKey('Host', 'clientSIP');
