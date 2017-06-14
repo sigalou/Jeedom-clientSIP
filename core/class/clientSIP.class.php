@@ -13,7 +13,7 @@ class clientSIP extends eqLogic {
 		$User["Pass"]=$this->getConfiguration("Password");
 		$User["Realm"]="sip.".config::byKey('Host', 'clientSIP');
 		$User["Display"]=$this->getName();
-		$User["WSServer"]="wss://wss.".config::byKey('Host', 'clientSIP').":"config::byKey('Port', 'clientSIP');
+		$User["WSServer"]="wss://wss.".config::byKey('Host', 'clientSIP').":".config::byKey('Port', 'clientSIP');
 		$_version = jeedom::versionAlias($_version);
 		$replace = array(
 			'#id#' => $this->getId(),
