@@ -636,7 +636,7 @@ $(document).ready(function() {
         e.preventDefault();
     });
 
-    $('#phoneUI').delegate('.btnCall', 'click', function(event) {
+    $('#phoneUI').on('click', '.btnCall', function(event) {
         ctxSip.phoneCallButtonPressed();
         // to close the dropdown
         return true;
@@ -647,37 +647,37 @@ $(document).ready(function() {
         ctxSip.logClear();
     });
 
-    $('#sip-logitems').delegate('.sip-logitem .btnCall', 'click', function(event) {
+    $('#sip-logitems').on('click', '.sip-logitem .btnCall', function(event) {
         var sessionid = $(this).closest('.sip-logitem').data('sessionid');
         ctxSip.phoneCallButtonPressed(sessionid);
         return false;
     });
 
-    $('#sip-logitems').delegate('.sip-logitem .btnHoldResume', 'click', function(event) {
+    $('#sip-logitems').on('click', '.sip-logitem .btnHoldResume', function(event) {
         var sessionid = $(this).closest('.sip-logitem').data('sessionid');
         ctxSip.phoneHoldButtonPressed(sessionid);
         return false;
     });
 
-    $('#sip-logitems').delegate('.sip-logitem .btnHangUp', 'click', function(event) {
+    $('#sip-logitems').on('click', '.sip-logitem .btnHangUp', function(event) {
         var sessionid = $(this).closest('.sip-logitem').data('sessionid');
         ctxSip.sipHangUp(sessionid);
         return false;
     });
 
-    $('#sip-logitems').delegate('.sip-logitem .btnTransfer', 'click', function(event) {
+    $('#sip-logitems').on('click', '.sip-logitem .btnTransfer', function(event) {
         var sessionid = $(this).closest('.sip-logitem').data('sessionid');
         ctxSip.sipTransfer(sessionid);
         return false;
     });
 
-    $('#sip-logitems').delegate('.sip-logitem .btnMute', 'click', function(event) {
+    $('#sip-logitems').on('click', '.sip-logitem .btnMute', function(event) {
         var sessionid = $(this).closest('.sip-logitem').data('sessionid');
         ctxSip.phoneMuteButtonPressed(sessionid);
         return false;
     });
 
-    $('#sip-logitems').delegate('.sip-logitem', 'dblclick', function(event) {
+    $('#sip-logitems').on('dblclick', '.sip-logitem', function(event) {
         event.preventDefault();
 
         var uri = $(this).data('uri');
