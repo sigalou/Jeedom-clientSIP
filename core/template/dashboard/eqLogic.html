@@ -1,8 +1,11 @@
 <?php
 include_file('desktop', 'moment.min', 'js', 'clientSIP');
 include_file('desktop', 'sip.min', 'js', 'clientSIP');
-include_file('desktop', 'config', 'js', 'clientSIP');
 include_file('desktop', 'app', 'js', 'clientSIP');
+?>
+<script>
+var user=#User#;
+</script>
 <div class="container-fluid allowResize eqLogic eqLogic-widget" data-eqLogic_id="#id#" data-version="dashboard" style="width: #width#;height: #height#;background-color: #background#;">
     <div class="clearfix sipStatus">
         <div id="txtCallStatus" class="pull-right">&nbsp;</div>
