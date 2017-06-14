@@ -11,9 +11,9 @@ class clientSIP extends eqLogic {
 	public function toHtml($_version = 'mobile',$Dialog=true) {
 		$User["User"]=$this->getConfiguration("Username");
 		$User["Pass"]=$this->getConfiguration("Password");
-		$User["Realm"]="sip.".config::byKey('Host', 'clientSIP');
+		$User["Realm"]=config::byKey('Host', 'clientSIP');
 		$User["Display"]=$this->getName();
-		$User["WSServer"]="wss://wss.".config::byKey('Host', 'clientSIP').":".config::byKey('Port', 'clientSIP');
+		$User["WSServer"]="wss://".config::byKey('Host', 'clientSIP')./*":".config::byKey('Port', 'clientSIP').*/"8089/ws";
 		$_version = jeedom::versionAlias($_version);
 		$replace = array(
 			'#id#' => $this->getId(),
