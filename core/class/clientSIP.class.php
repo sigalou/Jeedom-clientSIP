@@ -10,14 +10,18 @@ class clientSIP extends eqLogic {
 	}	
 	private function ConnectSip(){
 		try{
-			$api = new PhpSIP();
-			$api->setUsername($this->getConfiguration("Username")); // authentication username
-			$api->setPassword($this->getConfiguration("Password")); // authentication password
+			$Host=config::byKey('Host', 'clientSIP');
+			$Port=config::byKey('Port', 'clientSIP');
+			$Username=$this->getConfiguration("Username");
+			$Password=$this->getConfiguration("Password");
+			$api = new PhpSIP($Host,$Port);
+			$api->setUsername($Username); // authentication username
+			$api->setPassword(); // authentication password
 			// $api->setProxy('some_ip_here'); 
 			$api->addHeader('Event: resync');
 			$api->setMethod('NOTIFY');
-			$api->setFrom('sip:10000@sip.domain.com');
-			$api->setUri('sip:10000@sip.domain.com');
+			$api->setFrom('sip:'.$Username.'@'.$Host.':'.$Port);
+			$api->setUri('sip:'.$Username.'@'.$Host.':'.$Port);
 			$res = $api->send();
 			
 			log::add('clientSIP','debug',"response: $res");
