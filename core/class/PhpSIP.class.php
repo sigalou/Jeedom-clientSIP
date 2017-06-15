@@ -195,7 +195,7 @@ class BaseSipClass {
 
 	}
 
-	private function read() {
+	public function read() {
 
 		if (!is_resource($this->socket)) {
 
