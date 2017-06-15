@@ -83,7 +83,7 @@ class clientSIP extends eqLogic {
 				$Port=config::byKey('Port', 'clientSIP');
 				$Username=$clientSIP->getConfiguration("Username");
 				$Password=$clientSIP->getConfiguration("Password");
-				$api = new PhpSIP($Host,$Port);
+				$api = new PhpSIP($Host);
 				$api->setUsername($Username); // authentication username
 				$api->setPassword(); // authentication password
 				$api->setProxy('some_ip_here'); 
