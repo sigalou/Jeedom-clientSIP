@@ -89,7 +89,7 @@ class clientSIP extends eqLogic {
 				//$api->setProxy('some_ip_here'); 
 				$api->addHeader('Event: resync');
 				$api->setMethod('REGISTER');
-				//$api->setFrom('sip:'.$Username.'@'.$Host.':'.$Port);
+				$api->setFrom('sip:'.$Username.'@'.$Host.':'.$Port);
 				$api->setUri('sip:'.$Username.'@'.$Host.':'.$Port);
 				$res = $api->send();
 				log::add('clientSIP','debug',"response: $res");
