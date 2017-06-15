@@ -18,7 +18,7 @@ class clientSIP extends eqLogic {
 		return $return;
 	}
 	public static function deamon_start($_debug = false) {
-		log::remove('Volets');
+		log::remove('clientSIP');
 		self::deamon_stop();
 		$deamon_info = self::deamon_info();
 		if ($deamon_info['launchable'] != 'ok') 
@@ -35,12 +35,12 @@ class clientSIP extends eqLogic {
 				$cron->remove();
 		}
 	}	
-	public function toHtml($_version = 'mobile',$Dialog=true) {
+	public function toHtml($_version = 'mobile') {
 		$User["User"]=$this->getConfiguration("Username");
 		$User["Pass"]=$this->getConfiguration("Password");
 		$User["Realm"]=config::byKey('Host', 'clientSIP');
 		$User["Display"]=$this->getName();
-		$User["WSServer"]="wss://".config::byKey('Host', 'clientSIP').":"./*config::byKey('Port', 'clientSIP').*/"8089/ws";
+		//$User["WSServer"]="wss://".config::byKey('Host', 'clientSIP').":"./*config::byKey('Port', 'clientSIP').*/"8089/ws";
 		$_version = jeedom::versionAlias($_version);
 		$replace = array(
 			'#id#' => $this->getId(),
@@ -67,7 +67,7 @@ class clientSIP extends eqLogic {
 				$cron->save();
 		return $cron;
 	}
-	private function ConnectSip(){
+	public function ConnectSip(){
 		try{
 			$Host=config::byKey('Host', 'clientSIP');
 			$Port=config::byKey('Port', 'clientSIP');
