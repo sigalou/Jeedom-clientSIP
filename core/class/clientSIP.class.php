@@ -74,26 +74,29 @@ class clientSIP extends eqLogic {
 		$cron->run();
 		return $cron;
 	}
-	public function ConnectSip(){
-		try{
-			$Host=config::byKey('Host', 'clientSIP');
-			$Port=config::byKey('Port', 'clientSIP');
-			$Username=$this->getConfiguration("Username");
-			$Password=$this->getConfiguration("Password");
-			$api = new PhpSIP($Host,$Port);
-			$api->setUsername($Username); // authentication username
-			$api->setPassword(); // authentication password
-			// $api->setProxy('some_ip_here'); 
-			//$api->addHeader('Event: resync');
-			//$api->setMethod('NOTIFY');
-			//$api->setFrom('sip:'.$Username.'@'.$Host.':'.$Port);
-			//$api->setUri('sip:'.$Username.'@'.$Host.':'.$Port);
-			//$res = $api->send();
-			
-			//log::add('clientSIP','debug',"response: $res");
+	public static function ConnectSip(){
+		log::add('clientSIP', 'debug', 'Objet mis à jour => ' . json_encode($_option));
+		$clientSIP = Volets::byId($_option['id']);
+		if (is_object($clientSIP) && $clientSIP->getIsEnable()) {
+			try{
+				$Host=config::byKey('Host', 'clientSIP');
+				$Port=config::byKey('Port', 'clientSIP');
+				$Username=$clientSIP->getConfiguration("Username");
+				$Password=$clientSIP->getConfiguration("Password");
+				$api = new PhpSIP($Host,$Port);
+				$api->setUsername($Username); // authentication username
+				$api->setPassword(); // authentication password
+				$api->setProxy('some_ip_here'); 
+				$api->addHeader('Event: resync');
+				$api->setMethod('NOTIFY');
+				$api->setFrom('sip:'.$Username.'@'.$Host.':'.$Port);
+				$api->setUri('sip:'.$Username.'@'.$Host.':'.$Port);
+				$res = $api->send();
+				log::add('clientSIP','debug',"response: $res");
 
-		} catch (Exception $e) {
-			log::add('clientSIP','error',$e);
+			} catch (Exception $e) {
+				log::add('clientSIP','error',$e);
+			}
 		}
 	}
 }
