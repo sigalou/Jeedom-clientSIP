@@ -78,24 +78,19 @@ class clientSIP extends eqLogic {
 		log::add('clientSIP', 'debug', 'Objet mis à jour => ' . json_encode($_option));
 		$clientSIP = Volets::byId($_option['id']);
 		if (is_object($clientSIP) && $clientSIP->getIsEnable()) {
-			try{
-				$Host=config::byKey('Host', 'clientSIP');
-				$Port=config::byKey('Port', 'clientSIP');
-				$Username=$clientSIP->getConfiguration("Username");
-				$Password=$clientSIP->getConfiguration("Password");
-				$api = new PhpSIP($Host);
-				$api->setUsername($Username);
-				$api->setPassword($Password);
-				//$api->setProxy('some_ip_here'); 
-				$api->addHeader('Event: resync');
-				$api->setMethod('REGISTER');
-				$api->setFrom('sip:'.$Username.'@'.$Host.':'.$Port);
-				$api->setUri('sip:'.$Username.'@'.$Host.':'.$Port);
-				$res = $api->send();
-				log::add('clientSIP','debug',"response: $res");
-
+			$Host=config::byKey('Host', 'clientSIP');
+			$Port=config::byKey('Port', 'clientSIP');
+			$Username=$clientSIP->getConfiguration("Username");
+			$Password=$clientSIP->getConfiguration("Password");
+			try {
+				$sipClient = new BaseSipClass($Username, $Host);
+				$sipClient->debug = TRUE;
+				$sipClient->register();
+				//while(){
+				//}
+				$sipClient->close();
 			} catch (Exception $e) {
-				log::add('clientSIP','error',$e);
+				die("Caught exception ".$e->getMessage."\n");
 			}
 		}
 	}
