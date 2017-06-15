@@ -25,8 +25,11 @@ class clientSIP extends eqLogic {
 			return;
 		if ($deamon_info['state'] == 'ok') 
 			return;
-		foreach(eqLogic::byType('clientSIP') as $clientSIP)
-			$clientSIP->CreateDemon();
+		foreach(eqLogic::byType('clientSIP') as $clientSIP){
+			if($clientSIP->getIsEnable()){
+				$clientSIP->CreateDemon();   
+			}
+		}
 	}
 	public static function deamon_stop() {	
 		foreach(eqLogic::byType('clientSIP') as $clientSIP)
@@ -54,17 +57,17 @@ class clientSIP extends eqLogic {
 		return template_replace($replace, getTemplate('core', $_version, 'eqLogic','clientSIP'));
 	}
 	public function CreateDemon() {
-		$cron =cron::byClassAndFunction('clientSIP', 'ConnectSip', array('clientSIP' => $this->getId()));
-			if (!is_object($cron)) {
-				$cron = new cron();
-				$cron->setClass('clientSIP');
-				$cron->setFunction('ConnectSip');
-				$cron->setOption(array('id' => $this->getId()));
-				$cron->setEnable(1);
-				$cron->setDeamon(1);
-				$cron->save();
-			}
-				$cron->save();
+		$cron =cron::byClassAndFunction('clientSIP', 'ConnectSip', array('id' => $this->getId()));
+		if (!is_object($cron)) {
+			$cron = new cron();
+			$cron->setClass('clientSIP');
+			$cron->setFunction('ConnectSip');
+			$cron->setOption(array('id' => $this->getId()));
+			$cron->setEnable(1);
+			$cron->setDeamon(1);
+			$cron->save();
+		}
+		$cron->save();
 		return $cron;
 	}
 	public function ConnectSip(){
