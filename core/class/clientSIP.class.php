@@ -74,7 +74,7 @@ class clientSIP extends eqLogic {
 		$cron->run();
 		return $cron;
 	}
-	public static function ConnectSip(){
+	public static function ConnectSip($_option){
 		log::add('clientSIP', 'debug', 'Objet mis à jour => ' . json_encode($_option));
 		$clientSIP = Volets::byId($_option['id']);
 		if (is_object($clientSIP) && $clientSIP->getIsEnable()) {
