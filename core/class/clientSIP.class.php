@@ -86,8 +86,9 @@ class clientSIP extends eqLogic {
 				$sipClient = new BaseSipClass($Username, $Host);
 				$sipClient->debug = TRUE;
 				$sipClient->register();
-				//while(){
-				//}
+				while(true){
+					$sipClient->read();
+				}
 				$sipClient->close();
 			} catch (Exception $e) {
 				die("Caught exception ".$e->getMessage."\n");
