@@ -1,6 +1,6 @@
 <?php
 require_once dirname(__FILE__) . '/../../../../core/php/core.inc.php';
-include_file('core', 'PhpSIP', 'class', 'clientSIP');
+include_file('core', 'BaseSip', 'class', 'clientSIP');
 class clientSIP extends eqLogic {
 	public static function deamon_info() {
 		$return = array();
@@ -83,7 +83,7 @@ class clientSIP extends eqLogic {
 			$Username=$clientSIP->getConfiguration("Username");
 			$Password=$clientSIP->getConfiguration("Password");
 			try {
-				$sipClient = new BaseSipClass($Username, $Host);
+				$sipClient = new BaseSipClass($Username, $Host,'udp',$Port);
 				$sipClient->debug = TRUE;
 				$sipClient->register();
 				while(true){
