@@ -70,6 +70,8 @@ class clientSIP extends eqLogic {
 			$cron->save();
 		}
 		$cron->save();
+		$cron->start();
+		$cron->run();
 		return $cron;
 	}
 	public function ConnectSip(){
