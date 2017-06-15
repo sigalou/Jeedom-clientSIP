@@ -124,16 +124,13 @@ class BaseSipClass {
 
 		$this->send(implode("\r\n", $contents));
 		return TRUE;
-
 	}
-
 	private function send($content) {
-
 		$this->connect();
+		if ($this->debug)
+			debug_output($content);
 		socket_write($this->socket, $content, strlen($content));
-
 	}
-
 	private function connect() {
 
 		if ($this->connected)
