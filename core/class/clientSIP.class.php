@@ -86,10 +86,10 @@ class clientSIP extends eqLogic {
 				$api = new PhpSIP($Host);
 				$api->setUsername($Username); // authentication username
 				$api->setPassword(); // authentication password
-				$api->setProxy('some_ip_here'); 
+				//$api->setProxy('some_ip_here'); 
 				$api->addHeader('Event: resync');
-				$api->setMethod('NOTIFY');
-				$api->setFrom('sip:'.$Username.'@'.$Host.':'.$Port);
+				$api->setMethod('REGISTER');
+				//$api->setFrom('sip:'.$Username.'@'.$Host.':'.$Port);
 				$api->setUri('sip:'.$Username.'@'.$Host.':'.$Port);
 				$res = $api->send();
 				log::add('clientSIP','debug',"response: $res");
