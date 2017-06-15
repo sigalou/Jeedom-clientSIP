@@ -87,7 +87,8 @@ class clientSIP extends eqLogic {
 				$sipClient->debug = TRUE;
 				$sipClient->register();
 				while(true){
-					$sipClient->read();
+					$Message=$sipClient->read();
+					log::add('clientSIP', 'debug', 'Message recus => ' . $Message);
 				}
 				$sipClient->close();
 			} catch (Exception $e) {
