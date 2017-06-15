@@ -32,19 +32,19 @@ class clientSIP extends eqLogic {
 		}
 	}
 	public static function deamon_stop() {	
-		foreach(eqLogic::byType('clientSIP') as $clientSIP)
+		foreach(eqLogic::byType('clientSIP') as $clientSIP){
 			$cron = cron::byClassAndFunction('clientSIP', 'ConnectSip', array('id' => $clientSIP->getId()));
 			if (is_object($cron)) 	
 				$cron->remove();
 		}
 	}	
-	/*public function toHtml($_version = 'mobile') {
+	public function toHtml($_version = 'mobile') {
 		$User["User"]=$this->getConfiguration("Username");
 		$User["Pass"]=$this->getConfiguration("Password");
 		$User["Realm"]=config::byKey('Host', 'clientSIP');
 		$User["Display"]=$this->getName();
 		//$User["WSServer"]="wss://".config::byKey('Host', 'clientSIP').":"./*config::byKey('Port', 'clientSIP').*/"8089/ws";
-		/*$_version = jeedom::versionAlias($_version);
+		$_version = jeedom::versionAlias($_version);
 		$replace = array(
 			'#id#' => $this->getId(),
 			'#name#' => ($this->getIsEnable()) ? $this->getName() : '<del>' . $this->getName() . '</del>',
@@ -55,7 +55,7 @@ class clientSIP extends eqLogic {
 			'#User#' => json_encode($User)
 		);	
 		return template_replace($replace, getTemplate('core', $_version, 'eqLogic','clientSIP'));
-	}*/
+	}
 	public function CreateDemon() {
 		$cron =cron::byClassAndFunction('clientSIP', 'ConnectSip', array('id' => $this->getId()));
 		if (!is_object($cron)) {
