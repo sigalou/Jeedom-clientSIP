@@ -90,10 +90,8 @@ class clientSIP extends eqLogic {
 				$sipClient->setFrom('sip:'.$Username.'@'.$Host);
 				$sipClient->setUri('sip:'.$Username.'@'.$Host);
 				$res = $sipClient->send();
-				if($sipClient->register() === FALSE)
-					break;
 				while(true){
-					$Message=$sipClient->read();
+					$Message=$sipClient->listen('INVITE');
 					log::add('clientSIP', 'debug', 'Message recus => ' . $Message);
 				}
 				$sipClient=null;
