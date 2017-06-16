@@ -185,7 +185,7 @@ class sip {
 
 	}
 
-	private function read() {
+	public function read() {
 
 		if (!is_resource($this->socket)) {
 			$error = "Attempting to read on a socket that is not a resource";
