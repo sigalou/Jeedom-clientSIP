@@ -142,8 +142,8 @@ class clientSIPCmd extends cmd {
 				$this->getEqLogic()->checkAndUpdateCmd('CallStatus','Inactif');
 				$Host=config::byKey('Host', 'clientSIP');
 				$Port=config::byKey('Port', 'clientSIP');
-				$Username=$clientSIP->getEqLogic()->getConfiguration("Username");
-				$Password=$clientSIP->getEqLogic()->getConfiguration("Password");
+				$Username=$this->getEqLogic()->getConfiguration("Username");
+				$Password=$this->getEqLogic()->getConfiguration("Password");
 				try {
 					$clientSIP->checkAndUpdateCmd('RegStatus','En cours');
 					$sip = new sip($Host);
