@@ -41,11 +41,7 @@ class clientSIP extends eqLogic {
 					$clientSIP->_sip->setFrom('sip:'.$Username.'@'.$Host);
 					$clientSIP->_sip->setUri('sip:'.$Username.'@'.$Host);
 					$res = $clientSIP->_sip->send();
-					$clientSIP->_sip->checkAndUpdateCmd('RegStatus','Enregistrer');
-					//while(true){
-						//$clientSIP->_sip->listen('INVITE');
-					//}
-					//$sipClient=null;
+					$clientSIP->checkAndUpdateCmd('RegStatus','Enregistrer');
 				} catch (Exception $e) {
 					die("Caught exception ".$e->getMessage."\n");
 				}
@@ -55,6 +51,7 @@ class clientSIP extends eqLogic {
 	}
 	public static function deamon_stop() {	
 		foreach(eqLogic::byType('clientSIP') as $clientSIP){
+			 $clientSIP->_sip=null;
 			$clientSIP->checkAndUpdateCmd('RegStatus','Inactif');
 			$clientSIP->checkAndUpdateCmd('CallStatus','Inactif');
 			$cron = cron::byClassAndFunction('clientSIP', 'ConnectSip', array('id' => $clientSIP->getId()));
