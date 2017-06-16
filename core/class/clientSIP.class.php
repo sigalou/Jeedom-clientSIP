@@ -173,6 +173,8 @@ class clientSIPCmd extends cmd {
 
 					if ($res == 200) { 
 						$this->getEqLogic()->checkAndUpdateCmd('CallStatus','Appel en cours');
+						$sip->setUsername($Username);
+						$sip->setPassword($Password);
 						$sip->setMethod('REFER');
 						$sip->addHeader('Refer-to: sip:'.$_options['message'].'@'.$Host);
 						$sip->addHeader('Referred-By: sip:'.$_options['message'].'@'.$Host);
