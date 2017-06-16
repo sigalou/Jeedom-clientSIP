@@ -23,39 +23,6 @@
             $('#sip-logitems').append(i);
 */
 $(document).ready(function() {  
-            $("head").append(
-                        $(document.createElement("link")).attr({rel:"stylesheet", type:"text/css", href:"plugins/clientSIP/desktop/css/ctxSip.css"})
-            );
-    // Auto-focus number input on backspace.
-    $('#sipClient').keydown(function(event) {
-        if (event.which === 8) {
-            $('#numDisplay').focus();
-        }
-    });
-    $('#numDisplay').keypress(function(e) {
-        // Enter pressed? so Dial.
-        if (e.which === 13) {
-            //ctxSip.phoneCallButtonPressed();
-        }
-    });
-    $('.digit').click(function(event) {
-        event.preventDefault();
-        var num = $('#numDisplay').val(),
-            dig = $(this).data('digit');
-
-        $('#numDisplay').val(num+dig);
-
-       // ctxSip.sipSendDTMF(dig);
-        return false;
-    });
-    $('#phoneUI .dropdown-menu').click(function(e) {
-        e.preventDefault();
-    });
-    $('#phoneUI').on('click', '.btnCall', function(event) {
-       // ctxSip.phoneCallButtonPressed();
-        // to close the dropdown
-        return true;
-    });
     $('.sipLogClear').click(function(event) {
         event.preventDefault();
        // ctxSip.logClear();
