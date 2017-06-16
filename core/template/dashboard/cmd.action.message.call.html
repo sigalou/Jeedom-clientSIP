@@ -1,11 +1,55 @@
 <span class="cmd" data-type="action" data-subtype="other" data-cmd_id="#id#">
-  <button class="btn btn-success btn-block btnCall" title="Send">
-   <i class="fa fa-play"></i> #name#
-  </button>
+	<div class="input-group-btn">
+		<button class="btn btn-sm btn-primary dropdown-toggle" data-toggle="dropdown" title="Show Keypad">
+			<i class="fa fa-th"></i>
+		</button>
+		<div id="sip-dialpad" class="dropdown-menu">
+			<button type="button" class="btn btn-primary digit" data-digit="1">1<span>&nbsp;</span></button>
+			<button type="button" class="btn btn-primary digit" data-digit="2">2<span>ABC</span></button>
+			<button type="button" class="btn btn-primary digit" data-digit="3">3<span>DEF</span></button>
+			<button type="button" class="btn btn-primary digit" data-digit="4">4<span>GHI</span></button>
+			<button type="button" class="btn btn-primary digit" data-digit="5">5<span>JKL</span></button>
+			<button type="button" class="btn btn-primary digit" data-digit="6">6<span>MNO</span></button>
+			<button type="button" class="btn btn-primary digit" data-digit="7">7<span>PQRS</span></button>
+			<button type="button" class="btn btn-primary digit" data-digit="8">8<span>TUV</span></button>
+			<button type="button" class="btn btn-primary digit" data-digit="9">9<span>WXYZ</span></button>
+			<button type="button" class="btn btn-primary digit" data-digit="*">*<span>&nbsp;</span></button>
+			<button type="button" class="btn btn-primary digit" data-digit="0">0<span>+</span></button>
+			<button type="button" class="btn btn-primary digit" data-digit="#">#<span>&nbsp;</span></button>
+			<div class="clearfix">&nbsp;</div>
+			<button class="btn btn-success btn-block btnCall action" title="Send">
+				<i class="fa fa-play"></i> #name#
+			</button>
+		</div>
+	</div>
+	<input type="text" name="number" id="numDisplay" class="form-control text-center input-sm" value="" placeholder="Saisir le numero SIP" autocomplete="off" />
+            
 </span>
 <script>
+	$('.cmd[data-cmd_id="id#] .dropdown-menu').click(function(e) {
+		e.preventDefault();
+	});
+	$('#sipClient').keydown(function(event) {
+		if (event.which === 8) {
+			$('.cmd[data-cmd_id="id#] #numDisplay').focus();
+		}
+	});
+	$('#numDisplay').keypress(function(e) {
+		// Enter pressed? so Dial.
+		if (e.which === 13) {
+			$('.cmd[data-cmd_id="id#]  .btnCall').trigger('click');
+		}
+	});
+	$('.digit').click(function(event) {
+		event.preventDefault();
+		var num = $('.cmd[data-cmd_id="id#] #numDisplay').val();
+		var dig = $(this).data('digit');
+		$('#numDisplay').val(num+dig);
+		return false;
+	});
 	$(".cmd[data-cmd_id=#id#] .action").off();
 	$(".cmd[data-cmd_id=#id#] .action").on("click", function() {
-		jeedom.cmd.execute({id: "#id#"});
+		var num = $('.cmd[data-cmd_id="id#] #numDisplay').val();
+		jeedom.cmd.execute({id: '#id#', value: {message:num}});
 	});
 </script>
