@@ -91,10 +91,10 @@ $(document).ready(function() {
     });
     $('#sldVolume').on('change', function() {
 
-        var v      = $(this).val() / 100,
+        //var v      = $(this).val() / 100,
             // player = $('audio').get()[0],
-            btn    = $('#btnVol'),
-            icon   = $('#btnVol').find('i'),
+           // btn    = $('#btnVol'),
+           // icon   = $('#btnVol').find('i'),
           //  active = ctxSip.callActiveID;
 
         // Set the object and media stream volumes
