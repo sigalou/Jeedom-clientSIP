@@ -33,6 +33,7 @@ class clientSIP extends eqLogic {
 	}
 	public static function deamon_stop() {	
 		foreach(eqLogic::byType('clientSIP') as $clientSIP){
+			$clientSIP->checkAndUpdateCmd('RegStatus','Inactif');
 			$cron = cron::byClassAndFunction('clientSIP', 'ConnectSip', array('id' => $clientSIP->getId()));
 			if (is_object($cron)) 	
 				$cron->remove();
@@ -48,8 +49,22 @@ class clientSIP extends eqLogic {
 			'#height#' => $this->getDisplay('height', 'auto'),
 			'#width#' => $this->getDisplay('width', 'auto')
 		);	
+		foreach ($this->getCmd(null, null, true) as $cmd) {
+			 $replace['#'.$cmd->getLogicalId().'#'] = $cmd->toHtml($_version);
+		}   
 		return template_replace($replace, getTemplate('core', $_version, 'eqLogic','clientSIP'));
 	}
+	public function postSave() {
+		$this->AddCommande('Etat connexion','RegStatus','info', 'string');
+		$this->AddCommande('Etat appel','CallStatus','info', 'string');
+		$this->AddCommande('Appel','call','action','message','call');
+		$this->checkAndUpdateCmd('RegStatus','Inactif');
+	}
+	public static $_widgetPossibility = array('custom' => array(
+	        'visibility' => true,
+	        'displayName' => true,
+	        'optionalParameters' => true,
+	));
 	public function CreateDemon() {
 		$cron =cron::byClassAndFunction('clientSIP', 'ConnectSip', array('id' => $this->getId()));
 		if (!is_object($cron)) {
@@ -77,6 +92,7 @@ class clientSIP extends eqLogic {
 			$Username=$clientSIP->getConfiguration("Username");
 			$Password=$clientSIP->getConfiguration("Password");
 			try {
+				$clientSIP->checkAndUpdateCmd('RegStatus','En cours');
 				$sipClient = new sip($Host);
 				$sipClient->setUsername($Username);
 				$sipClient->setPassword($Password);
@@ -84,6 +100,7 @@ class clientSIP extends eqLogic {
 				$sipClient->setFrom('sip:'.$Username.'@'.$Host);
 				$sipClient->setUri('sip:'.$Username.'@'.$Host);
 				$res = $sipClient->send();
+				$clientSIP->checkAndUpdateCmd('RegStatus','Enregistrer');
 				//while(true){
 					$sipClient->listen('INVITE');
 				//}
@@ -92,6 +109,26 @@ class clientSIP extends eqLogic {
 				die("Caught exception ".$e->getMessage."\n");
 			}
 		}
+	}
+	public function AddCommande($Name,$_logicalId,$Type="info", $SubType='string',$Template='') {
+		$Commande = $this->getCmd(null,$_logicalId);
+		if (!is_object($Commande))
+		{
+			$Commande = new clientSIPCmd();
+			$Commande->setId(null);
+			$Commande->setEqLogic_id($this->getId());
+		}
+		$Commande->setLogicalId($_logicalId);
+		$Commande->setName($Name);
+		$Commande->setIsVisible(1);
+		$Commande->setType($Type);
+		$Commande->setSubType($SubType);
+			if($Template !=''){
+			$Commande->setTemplate('dashboard',$Template);
+			$Commande->setTemplate('mobile','Bouteille');
+		}
+		$Commande->save();
+		return $Commande;
 	}
 }
 class clientSIPCmd extends cmd {
