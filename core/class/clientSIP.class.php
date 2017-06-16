@@ -150,7 +150,7 @@ class clientSIPCmd extends cmd {
 					$sip->setUsername($Username);
 					$sip->setPassword($Password);
 					$sip->setMethod('INVITE');
-					$sipset->From('sip:'.$_options['message'].'@'.$Host);
+					$sip->setFrom('sip:'.$_options['message'].'@'.$Host);
 					$sip->setUri('sip:'.$_options['message'].'@'.$Host);
 					$res = $sip->send();
 					
