@@ -65,30 +65,25 @@
             
 </span>
 <script>
-	$('.cmd[data-cmd_id="id#] .dropdown-menu').click(function(e) {
+	$('.cmd[data-cmd_id=#id#] .dropdown-menu').click(function(e) {
 		e.preventDefault();
 	});
-	$('#sipClient').keydown(function(event) {
-		if (event.which === 8) {
-			$('.cmd[data-cmd_id="id#] #numDisplay').focus();
-		}
-	});
-	$('#numDisplay').keypress(function(e) {
+	$('.cmd[data-cmd_id=#id#] #numDisplay').keypress(function(e) {
 		// Enter pressed? so Dial.
 		if (e.which === 13) {
-			$('.cmd[data-cmd_id="id#]  .btnCall').trigger('click');
+			$('.cmd[data-cmd_id=#id#]  .btnCall').trigger('click');
 		}
 	});
 	$('.digit').click(function(event) {
 		event.preventDefault();
-		var num = $('.cmd[data-cmd_id="id#] #numDisplay').val();
-		var dig = $(this).data('digit');
+		var num = $('.cmd[data-cmd_id=#id#] #numDisplay').val();
+		var dig = $(this).attr('data-digit');
 		$('#numDisplay').val(num+dig);
 		return false;
 	});
 	$(".cmd[data-cmd_id=#id#] .action").off();
 	$(".cmd[data-cmd_id=#id#] .action").on("click", function() {
-		var num = $('.cmd[data-cmd_id="id#] #numDisplay').val();
+		var num = $('.cmd[data-cmd_id=#id#] #numDisplay').val();
 		alert(num);
 		jeedom.cmd.execute({id: '#id#', value: {message:num}});
 	});
