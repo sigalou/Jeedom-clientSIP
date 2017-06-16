@@ -556,7 +556,7 @@ class sip
       $methods = array($methods);
     }
     
-    log::add('clientSIP','debug',"Listenning for ".implode(", ",$methods)."\n";
+    log::add('clientSIP','debug',"Listenning for ".implode(", ",$methods));
     
     
     if ($this->server_mode)
