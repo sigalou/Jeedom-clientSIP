@@ -1,6 +1,6 @@
 {
 	"id" : "clientSIP",
-	"name" : "Jeedom repond sur votre reseau SIP",
+	"name" : "Client SIP",
 	"licence" : "AGPL",
 	"author" : "Halbout Michael",
 	"require" : "2.4",
