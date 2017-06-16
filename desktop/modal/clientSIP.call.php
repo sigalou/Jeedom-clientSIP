@@ -1,4 +1,3 @@
-<link href="plugins/clientSIP/desktop/ctxSip.css" rel="stylesheet" type="text/css" /> 
 <div class="clearfix sipStatus">
         <div id="txtCallStatus" class="pull-right">&nbsp;</div>
         <div id="txtRegStatus"></div>
