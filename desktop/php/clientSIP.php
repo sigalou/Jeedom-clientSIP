@@ -162,7 +162,7 @@ $eqLogics = eqLogic::byType('clientSIP');
 							</label>
 							<div class="col-sm-9">
 								<input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="Username" placeholder="{{Login}}"/>
-								<input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="Password" placeholder="{{Mots de passe}}"/>
+								<input type="password" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="Password" placeholder="{{Mots de passe}}"/>
 							</div>
 						</div>
 					</fieldset> 
