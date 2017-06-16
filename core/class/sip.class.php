@@ -180,7 +180,7 @@ class sip {
 			$this->clientPort = $clientPort;
 
 		else
-			log::add('clientSIP','debug',("Unable to get client side port");
+			log::add('clientSIP','debug',"Unable to get client side port");
 
 		return TRUE;
 
