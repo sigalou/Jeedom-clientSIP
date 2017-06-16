@@ -22,7 +22,10 @@
 
             $('#sip-logitems').append(i);
 */
-$(document).ready(function() {
+$(document).ready(function() {  
+            $("head").append(
+                        $(document.createElement("link")).attr({rel:"stylesheet", type:"text/css", href:"plugins/clientSIP/desktop/ctxSip.css"})
+            );
     // Auto-focus number input on backspace.
     $('#sipClient').keydown(function(event) {
         if (event.which === 8) {
