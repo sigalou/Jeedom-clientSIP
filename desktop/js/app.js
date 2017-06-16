@@ -24,7 +24,7 @@
 */
 $(document).ready(function() {  
             $("head").append(
-                        $(document.createElement("link")).attr({rel:"stylesheet", type:"text/css", href:"plugins/clientSIP/desktop/ctxSip.css"})
+                        $(document.createElement("link")).attr({rel:"stylesheet", type:"text/css", href:"plugins/clientSIP/desktop/css/ctxSip.css"})
             );
     // Auto-focus number input on backspace.
     $('#sipClient').keydown(function(event) {
