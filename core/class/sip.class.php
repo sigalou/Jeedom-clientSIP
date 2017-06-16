@@ -1,10 +1,8 @@
 <?php
 
-class BaseSipClass {
-
+class sip {
 	public $to=NULL;
 	public $from=NULL;
-	public $debug=FALSE;
 	public $protocol=NULL;
 	public $serverIP=NULL;
 	public $serverHostname=NULL;
@@ -24,8 +22,7 @@ class BaseSipClass {
 
 			$error = "Invalid protocol specified";
 
-			if ($this->debug)
-				debug_output($error);
+			log::add('clientSIP','error',$error);
 
 			throw new Exception($error);
 
@@ -36,8 +33,7 @@ class BaseSipClass {
 
 			$error = "Invalid port specified";
 
-			if ($this->debug)
-				debug_output($error);
+			log::add('clientSIP','error',$error);
 
 			throw new Exception($error);
 
@@ -54,9 +50,7 @@ class BaseSipClass {
 
 				$error = "Unable to resolve server hostname";
 				$error = "Invalid port specified";
-
-				if ($this->debug)
-					debug_output($error);
+				log::add('clientSIP','error',$error);
 
 				throw new Exception($error);
 
@@ -122,14 +116,18 @@ class BaseSipClass {
 		$contents[] = "Content-Length: 0";
 		$contents[] = "Max-Forwards: 70";
 
-		$this->send(implode("\r\n", $contents));
-		return TRUE;
+		return $this->send(implode("\r\n", $contents));
 	}
 	private function send($content) {
 		$this->connect();
-		if ($this->debug)
-			debug_output($content);
 		socket_write($this->socket, $content, strlen($content));
+		$result=$this->read();
+		log::add('clientSIP','debug',"Result : ".$result);
+		switch($result){
+			case '200':
+				return true;
+			default:
+				return false;
 	}
 	private function connect() {
 
@@ -137,17 +135,14 @@ class BaseSipClass {
 			return TRUE;
 
 		$this->createSocket();
-
-		if ($this->debug)
-			debug_output("Attempting to connect to '".$this->serverIP."' on port '".$this->port."' ... ");
+		log::add('clientSIP','debug',"Attempting to connect to '".$this->serverIP."' on port '".$this->port."' ... ");
 
 		$result = socket_connect($this->socket, $this->serverIP, $this->port);
 
 		if ($result === FALSE) {
 
 			$error = "socket_connect() failed. Reason: ($result) " . socket_strerror(socket_last_error($this->socket)) . "\n";
-			if ($this->debug)
-				debug_output($error);
+			log::add('clientSIP','error',$error);
 
 			throw new Exception($error);
 
@@ -170,9 +165,7 @@ class BaseSipClass {
 		if ($socket === FALSE) {
 
 			$error = "socket_create() failed: reason: " . socket_strerror(socket_last_error());
-
-			if ($this->debug)
-				debug_output($error);
+			log::add('clientSIP','error',($error);
 
 			throw new Exception($error);
 
@@ -185,21 +178,18 @@ class BaseSipClass {
 		if ($returnValue === TRUE)
 			$this->clientPort = $clientPort;
 
-		else if ($this->debug)
-			debug_output("Unable to get client side port");
+		else
+			log::add('clientSIP','debug',("Unable to get client side port");
 
 		return TRUE;
 
 	}
 
-	public function read() {
+	private function read() {
 
 		if (!is_resource($this->socket)) {
-
 			$error = "Attempting to read on a socket that is not a resource";
-
-			if ($this->debug)
-				debug_output($error);
+			log::add('clientSIP','error',$error);
 
 			throw new Exception($error);
 
@@ -216,14 +206,10 @@ class BaseSipClass {
 
 		if (!is_resource($this->socket))
 			return FALSE;
-
-		if ($this->debug)
-			debug_output("Closing socket ... ", TRUE);
+		log::add('clientSIP','debug',"Closing socket ... ");
 
 		$returnValue = socket_close($this->socket);
-
-		if ($this->debug)
-			debug_output("socket closed.");
+		log::add('clientSIP','debug',"socket closed.");
 
 	}
 
@@ -231,26 +217,4 @@ class BaseSipClass {
 		return implode($this->commands, ",");
 	}
 }
-
-function debug_output($message, $type=FALSE) {
-
-	$date = date("Y-m-d H:i:s");
-
-	if ($type)
-		$GLOBALS["debug"] = "$date:\t$message";
-
-	else {
-
-		if (strlen($GLOBALS["debug"]) == 0)
-			echo "$date:\t$message\n";
-
-		else {
-
-	        	echo $GLOBALS["debug"]."$message\n";
-			$GLOBALS["debug"] = "";
-
-		}
-	}
-}
-
 ?>
