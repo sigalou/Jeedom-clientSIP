@@ -10,8 +10,8 @@ class clientSIP extends eqLogic {
 		$return['state'] = 'nok';
 		foreach(eqLogic::byType('clientSIP') as $clientSIP){
 			if($clientSIP->getIsEnable()){
-				if($clientSIP->_sip == null)
-					return $return;
+				//if($clientSIP->_sip == null)
+					//return $return;
 				/*$cron = cron::byClassAndFunction('clientSIP', 'ConnectSip', array('id' => $clientSIP->getId()));
 				if (!is_object($cron)) 	
 					return $return;*/
