@@ -139,13 +139,12 @@ class clientSIPCmd extends cmd {
 	public function execute($_options = null){
 		switch($this->getLogicalId()){
 			case 'call':				
-				$this->getEqLogic()->checkAndUpdateCmd('CallStatus','Inactif');
 				$Host=config::byKey('Host', 'clientSIP');
 				$Port=config::byKey('Port', 'clientSIP');
 				$Username=$this->getEqLogic()->getConfiguration("Username");
 				$Password=$this->getEqLogic()->getConfiguration("Password");
 				try {
-					$this->getEqLogic()->checkAndUpdateCmd('RegStatus','En cours');
+					$this->getEqLogic()->checkAndUpdateCmd('CallStatus','Inactif');
 					$sip = new sip($Host);
 					$sip->setUsername($Username);
 					$sip->setPassword($Password);
@@ -153,9 +152,18 @@ class clientSIPCmd extends cmd {
 					$sip->setFrom('sip:'.$_options['message'].'@'.$Host);
 					$sip->setUri('sip:'.$_options['message'].'@'.$Host);
 					$res = $sip->send();
-					
-					log::add('clientSIP', 'debug', 'Retour => ' . $res);
-					$this->getEqLogic()->checkAndUpdateCmd('CallStatus','Appel en cours');
+					switch($res){
+						case '200':
+							$this->getEqLogic()->checkAndUpdateCmd('CallStatus','Appel en cours');
+						break;
+						case '318':
+							$this->getEqLogic()->checkAndUpdateCmd('CallStatus','Sonnerie');
+						break;
+						default:
+							$sip=null;
+							$this->getEqLogic()->checkAndUpdateCmd('CallStatus','Inactif');
+						break;
+					}
 
 				} catch (Exception $e) {
 					die("Caught exception ".$e->getMessage."\n");
