@@ -145,7 +145,7 @@ class clientSIPCmd extends cmd {
 				$Username=$this->getEqLogic()->getConfiguration("Username");
 				$Password=$this->getEqLogic()->getConfiguration("Password");
 				try {
-					$clientSIP->checkAndUpdateCmd('RegStatus','En cours');
+					$this->getEqLogic()->checkAndUpdateCmd('RegStatus','En cours');
 					$sip = new sip($Host);
 					$sip->setUsername($Username);
 					$sip->setPassword($Password);
