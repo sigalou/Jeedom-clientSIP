@@ -119,8 +119,9 @@ class sip {
 	private function send($content) {
 		$this->connect();
 		$write=socket_write($this->socket, $content, strlen($content));
+			log::add('clientSIP','debug',$write);
 		if($write <=0){
-			log::add('clientSIP','debug',"La requete a échoué");
+			log::add('clientSIP','error',"La requete a échoué");
 			return false;
 		}
 		$result=$this->read();
