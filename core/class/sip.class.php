@@ -113,11 +113,16 @@ class sip {
 		$contents[] = "Content-Length: 0";
 		$contents[] = "Max-Forwards: 70";
 
+		log::add('clientSIP','debug',"Enregistrement du client ".$clientHostname." aupres du server");
 		return $this->send(implode("\r\n", $contents));
 	}
 	private function send($content) {
 		$this->connect();
-		socket_write($this->socket, $content, strlen($content));
+		$write=socket_write($this->socket, $content, strlen($content));
+		if($write <=0){
+			log::add('clientSIP','debug',"La requete a échoué");
+			return false;
+		}
 		$result=$this->read();
 		log::add('clientSIP','debug',"Result : ".$result);
 		switch($result){
@@ -136,16 +141,13 @@ class sip {
 		log::add('clientSIP','debug',"Attente de la connexion au serveur ".$this->serverIP.":".$this->port);
 
 		$result = socket_connect($this->socket, $this->serverIP, $this->port);
-
 		if ($result === FALSE) {
-
 			$error = "socket_connect() failed. Reason: ($result) " . socket_strerror(socket_last_error($this->socket)) . "\n";
 			log::add('clientSIP','error',$error);
-
 			throw new Exception($error);
-
 		}
 
+		log::add('clientSIP','debug',"Connexion établie avec le serveur ".$this->serverIP.":".$this->port);
 		$this->connected = TRUE;
 
 	}
