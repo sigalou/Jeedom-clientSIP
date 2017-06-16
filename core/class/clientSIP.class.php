@@ -99,7 +99,7 @@ class clientSIP extends eqLogic {
 				$sip->setUsername($Username);
 				$sip->setPassword($Password);
 				$sip->setMethod('REGISTER');
-				$sipsetFrom('sip:'.$Username.'@'.$Host);
+				$sip->setFrom('sip:'.$Username.'@'.$Host);
 				$sip->setUri('sip:'.$Username.'@'.$Host);
 				$res = $sip->send();
 				log::add('clientSIP', 'debug', 'Retour => ' . $res);
@@ -150,7 +150,7 @@ class clientSIPCmd extends cmd {
 					$sip->setUsername($Username);
 					$sip->setPassword($Password);
 					$sip->setMethod('INVITE');
-					$sipsetFrom('sip:'.$_options['message'].'@'.$Host);
+					$sipset->From('sip:'.$_options['message'].'@'.$Host);
 					$sip->setUri('sip:'.$_options['message'].'@'.$Host);
 					$res = $sip->send();
 					
