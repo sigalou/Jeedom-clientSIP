@@ -90,10 +90,10 @@ class clientSIP extends eqLogic {
 				$sipClient->setFrom('sip:'.$Username.'@'.$Host);
 				$sipClient->setUri('sip:'.$Username.'@'.$Host);
 				$res = $sipClient->send();
-				while(true){
+				/*while(true){
 					$Message=$sipClient->listen('INVITE');
 					log::add('clientSIP', 'debug', 'Message recus => ' . $Message);
-				}
+				}*/
 				$sipClient=null;
 			} catch (Exception $e) {
 				die("Caught exception ".$e->getMessage."\n");
