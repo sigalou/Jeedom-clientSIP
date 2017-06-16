@@ -1,7 +1,7 @@
 <div class="input-group-btn cmd" data-type="action" data-subtype="other" data-cmd_id="#id#">
 	<style>
 		.digit {
-			  height: 46px;
+			  height: 66px;
 			  width: 66px;
 			  margin: 0 8px 14px !important;
 			  background-color: #f8f8f8;
@@ -60,12 +60,12 @@
 			</button>
 		</div>
 	</div>
-<input type="text" name="number" id="numDisplay" class="form-control text-center input-sm" placeholder="Saisir le numero SIP" autocomplete="off" />    
+<input type="text" name="number" data-cmd_id=#id# class="numDisplay form-control text-center input-sm" placeholder="Saisir le numero SIP" autocomplete="off" />    
 <script>
 	$('.cmd[data-cmd_id=#id#]').on('click','.dropdown-menu',function(e) {
 		e.preventDefault();
 	});
-	$('.cmd[data-cmd_id=#id#]').on('keypress','#numDisplay',function(e) {
+	$('.numDisplay[data-cmd_id=#id#]').on('keypress',function(e) {
 		// Enter pressed? so Dial.
 		if (e.which === 13) {
 			$('.cmd[data-cmd_id=#id#]  .btnCall').trigger('click');
@@ -73,15 +73,14 @@
 	});
 	$('.cmd[data-cmd_id=#id#]').on('click','.digit',function(event) {
 		event.preventDefault();
-		var num = $('.cmd[data-cmd_id=#id#]').parent().find('#numDisplay').val();
+		var num = $('.numDisplay[data-cmd_id=#id#]').val();
 		var dig = $(this).attr('data-digit');
-		$('#numDisplay').val(num+dig);
+		$('.numDisplay[data-cmd_id=#id#]').val(num+dig);
 		return false;
 	});
 	$(".cmd[data-cmd_id=#id#] .action").off();
 	$(".cmd[data-cmd_id=#id#] .action").on("click", function() {
-		var num = $('.cmd[data-cmd_id=#id#]').parent().find('#numDisplay').val();
-		alert(num);
+		var num = $('.numDisplay[data-cmd_id=#id#]').val();
 		jeedom.cmd.execute({id: '#id#', value: {message:num}});
 	});
 </script>
