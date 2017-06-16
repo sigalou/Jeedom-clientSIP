@@ -83,14 +83,20 @@ class clientSIP extends eqLogic {
 			$Username=$clientSIP->getConfiguration("Username");
 			$Password=$clientSIP->getConfiguration("Password");
 			try {
-				$sipClient = new sip($Username, $Host,'udp',$Port);
+				$sipClient = new sip($Host,$Port);
+				$sipClient->setUsername($Username);
+				$sipClient->setPassword($Password);
+				$sipClient->setMethod('REGISTER');
+				$sipClient->setFrom('sip:'.$Username.'@'.$Host);
+				$sipClient->setUri('sip:'.$Username.'@'.$Host);
+				$res = $sipClient->send();
 				if($sipClient->register() === FALSE)
 					break;
 				while(true){
 					$Message=$sipClient->read();
 					log::add('clientSIP', 'debug', 'Message recus => ' . $Message);
 				}
-				$sipClient->close();
+				$sipClient=null;
 			} catch (Exception $e) {
 				die("Caught exception ".$e->getMessage."\n");
 			}
