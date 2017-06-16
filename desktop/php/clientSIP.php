@@ -154,13 +154,13 @@ $eqLogics = eqLogic::byType('clientSIP');
 							</div>
 						</div>
 						<div class="form-group">
-							<label class="col-sm-2 control-label" >
+							<label class="col-md-2 control-label" >
 								{{Autentification}}
 								<sup>
 									<i class="fa fa-question-circle tooltips" title="" style="font-size : 1em;color:grey;"></i>
 								</sup>
 							</label>
-							<div class="col-sm-9">
+							<div class="col-md-3">
 								<input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="Username" placeholder="{{Login}}"/>
 								<input type="password" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="Password" placeholder="{{Mots de passe}}"/>
 							</div>
