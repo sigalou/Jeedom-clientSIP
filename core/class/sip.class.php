@@ -128,6 +128,7 @@ class sip {
 				return true;
 			default:
 				return false;
+		}
 	}
 	private function connect() {
 
