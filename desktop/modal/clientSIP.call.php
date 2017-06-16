@@ -28,7 +28,7 @@
                     </button>
                 </div>
             </div>
-            <input type="text" name="number" id="numDisplay" class="form-control text-center input-sm" value="" placeholder="Enter number..." autocomplete="off" />
+            <input type="text" name="number" id="numDisplay" class="form-control text-center input-sm" value="" placeholder="Saisir le numero SIP" autocomplete="off" />
             <div class="input-group-btn input-group-btn-sm">
                 <button class="btn btn-sm btn-primary dropdown-toggle" id="btnVol" data-toggle="dropdown" title="Volume">
                     <i class="fa fa-fw fa-volume-up"></i>
@@ -47,10 +47,7 @@
                 <span class="fa-stack fa-2x">
                     <i class="fa fa-circle fa-stack-2x text-success"></i>
                     <i class="fa fa-phone fa-stack-1x fa-inverse"></i>
-                </span><br>
-                This is your phone.</h3>
-                <p class="lead">To make a call enter a number or SIP address in the box above.</p>
-                <small>Closing this window will cause calls to go to voicemail.</small>
+                </span><br></h3>
             </div>
         </div>
 
@@ -59,27 +56,13 @@
                 <h4 class="text-muted panel-title">Recent Calls <span class="pull-right"><i class="fa fa-trash text-muted sipLogClear" title="Clear Log"></i></span></h4>
             </div>
             <div id="sip-logitems" class="list-group">
-                <p class="text-muted text-center">No recent calls from this browser.</p>
+                <p class="text-muted text-center">Aucun appel recent.</p>
             </div>
         </div>
     </div>
-
-    <div class="modal fade" id="mdlError" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static" data-keyboard="false">
-        <div class="modal-dialog modal-sm">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title">Sip Error</h4>
-                </div>
-                <div class="modal-body text-center text-danger">
-                    <h3><i class="fa fa-3x fa-ban"></i></h3>
-                    <p class="lead">Sip registration failed. No calls can be handled.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-<audio id="ringtone" src="plugins/clientSIP/core/template/sounds/incoming.mp3" loop></audio>
-<audio id="ringbacktone" src="plugins/clientSIP/core/template/sounds/outgoing.mp3" loop></audio>
-<audio id="dtmfTone" src="plugins/clientSIP/core/template/sounds/dtmf.mp3"></audio>
-<audio id="audioRemote"></audio>
-<script type="text/javascript" src="plugins/clientSIP/desktop/js/moment.js"></script>
-<script type="text/javascript" src="plugins/clientSIP/desktop/js/app.js"></script>
+        <audio id="ringtone" src="plugins/clientSIP/core/template/sounds/incoming.mp3" loop></audio>
+        <audio id="ringbacktone" src="plugins/clientSIP/core/template/sounds/outgoing.mp3" loop></audio>
+        <audio id="dtmfTone" src="plugins/clientSIP/core/template/sounds/dtmf.mp3"></audio>
+        <audio id="audioRemote"></audio>
+        <script type="text/javascript" src="plugins/clientSIP/desktop/js/moment.js"></script>
+        <script type="text/javascript" src="plugins/clientSIP/desktop/js/app.js"></script>
