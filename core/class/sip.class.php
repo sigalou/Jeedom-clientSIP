@@ -166,7 +166,7 @@ class sip {
 		if ($socket === FALSE) {
 
 			$error = "socket_create() failed: reason: " . socket_strerror(socket_last_error());
-			log::add('clientSIP','error',($error);
+			log::add('clientSIP','error',$error);
 
 			throw new Exception($error);
 
