@@ -1,4 +1,4 @@
-<div class="cmd" data-type="action" data-subtype="other" data-cmd_id="#id#">
+<div class="input-group-btn cmd" data-type="action" data-subtype="other" data-cmd_id="#id#">
 	<style>
 		.digit {
 			  height: 66px;
@@ -38,7 +38,6 @@
 		  	color: #bbb;
 		}
 	</style>
-	<div class="input-group-btn">
 		<button class="btn btn-sm btn-primary dropdown-toggle" data-toggle="dropdown" title="Show Keypad">
 			<i class="fa fa-th"></i>
 		</button>
@@ -61,28 +60,27 @@
 			</button>
 		</div>
 	</div>
-	<input type="text" name="number" id="numDisplay" class="form-control text-center input-sm" placeholder="Saisir le numero SIP" autocomplete="off" />    
-</div>
+<input type="text" name="number" id="numDisplay" class="form-control text-center input-sm" placeholder="Saisir le numero SIP" autocomplete="off" />    
 <script>
-	$('.cmd[data-cmd_id=#id#] .dropdown-menu').click(function(e) {
+	$('.cmd[data-cmd_id=#id#]').on('click','.dropdown-menu'function(e) {
 		e.preventDefault();
 	});
-	$('.cmd[data-cmd_id=#id#] #numDisplay').keypress(function(e) {
+	$('.cmd[data-cmd_id=#id#]').on('keypress','#numDisplay',function(e) {
 		// Enter pressed? so Dial.
 		if (e.which === 13) {
 			$('.cmd[data-cmd_id=#id#]  .btnCall').trigger('click');
 		}
 	});
-	$('.digit').click(function(event) {
+	$('.cmd[data-cmd_id=#id#]').on('click','.digit',function(event) {
 		event.preventDefault();
-		var num = $('.cmd[data-cmd_id=#id#] #numDisplay').val();
+		var num = $('.cmd[data-cmd_id=#id#]').parent().find('#numDisplay').val();
 		var dig = $(this).attr('data-digit');
 		$('#numDisplay').val(num+dig);
 		return false;
 	});
 	$(".cmd[data-cmd_id=#id#] .action").off();
 	$(".cmd[data-cmd_id=#id#] .action").on("click", function() {
-		var num = $('.cmd[data-cmd_id=#id#] #numDisplay').val();
+		var num = $('.cmd[data-cmd_id=#id#]').parent().find('#numDisplay').val();
 		alert(num);
 		jeedom.cmd.execute({id: '#id#', value: {message:num}});
 	});
