@@ -20,7 +20,7 @@ class sip {
 
 		if ($protocol !== "udp" && $protocol !== "tcp") {
 
-			$error = "Invalid protocol specified";
+			$error = "Protocole non supporté";
 
 			log::add('clientSIP','error',$error);
 
@@ -29,10 +29,8 @@ class sip {
 		} else
 			$this->protocol = $protocol;
 
-		if (!is_null($port) && !ctype_digit($port)) {
-
-			$error = "Invalid port specified";
-
+		if (!is_null($port) && !ctype_digit($port)) {			
+			$error = "Port spécifié invalide";
 			log::add('clientSIP','error',$error);
 
 			throw new Exception($error);
@@ -48,8 +46,7 @@ class sip {
 
 			if ($serverIP == $this->serverHostname) {
 
-				$error = "Unable to resolve server hostname";
-				$error = "Invalid port specified";
+				$error = "Impossible de se connecter";
 				log::add('clientSIP','error',$error);
 
 				throw new Exception($error);
@@ -136,7 +133,7 @@ class sip {
 			return TRUE;
 
 		$this->createSocket();
-		log::add('clientSIP','debug',"Attempting to connect to '".$this->serverIP."' on port '".$this->port."' ... ");
+		log::add('clientSIP','debug',"Attente de la connexion au serveur ".$this->serverIP.":".$this->port);
 
 		$result = socket_connect($this->socket, $this->serverIP, $this->port);
 
@@ -180,7 +177,7 @@ class sip {
 			$this->clientPort = $clientPort;
 
 		else
-			log::add('clientSIP','debug',"Unable to get client side port");
+			log::add('clientSIP','debug',"Impossible de trouver le port du client");
 
 		return TRUE;
 
@@ -189,9 +186,8 @@ class sip {
 	public function read() {
 
 		if (!is_resource($this->socket)) {
-			$error = "Attempting to read on a socket that is not a resource";
+			$error = "Accune connexion initialisé";
 			log::add('clientSIP','error',$error);
-
 			throw new Exception($error);
 
 		}
@@ -207,10 +203,10 @@ class sip {
 
 		if (!is_resource($this->socket))
 			return FALSE;
-		log::add('clientSIP','debug',"Closing socket ... ");
+		log::add('clientSIP','debug',"Fermeture de la connexion");
 
 		$returnValue = socket_close($this->socket);
-		log::add('clientSIP','debug',"socket closed.");
+		log::add('clientSIP','debug',"Connexion fermée.");
 
 	}
 
