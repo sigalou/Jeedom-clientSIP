@@ -56,12 +56,14 @@ class sip
     if (!function_exists('socket_create'))
     {
       log::add('clientSIP','error',"socket_create() function missing.");
+      die();
     }
     if ($src_ip)
     {
       if (!preg_match('/^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$/', $src_ip))
       {
         log::add('clientSIP','error',"Invalid src_ip $src_ip");
+      die();
       }
     }
     else
@@ -79,6 +81,7 @@ class sip
         if (!is_array($addr) || !isset($addr[0]) || substr($addr[0],0,3) == '127')
         {
           log::add('clientSIP','error',"Failed to obtain IP address to bind. Please set bind address manualy.");
+      die();
         }
       
         $src_ip = $addr[0];
@@ -92,6 +95,7 @@ class sip
       if (!preg_match('/^[0-9]+$/',$src_port))
       {
         log::add('clientSIP','error',"Invalid src_port $src_port");
+      die();
       }
       
       $this->src_port = $src_port;
@@ -103,6 +107,7 @@ class sip
       if (!preg_match('/^[0-9]+$/',$fr_timer))
       {
         log::add('clientSIP','error',"Invalid fr_timer $fr_timer");
+      die();
       }
       
       $this->fr_timer = $fr_timer;
@@ -128,6 +133,7 @@ class sip
     if ($this->min_port > $this->max_port)
     {
       log::add('clientSIP','error',"Min port is bigger than max port.");
+      die();
     }
     
     $fp = @fopen($this->lock_file, 'a+');
@@ -135,6 +141,7 @@ class sip
     if (!$fp)
     {
      log::add('clientSIP','error',"Failed to open lock file ".$this->lock_file);
+      die();
     }
     
     $canWrite = flock($fp, LOCK_EX);
@@ -142,6 +149,7 @@ class sip
     if (!$canWrite)
     {
       log::add('clientSIP','error',"Failed to lock a file in 1000 ms.");
+      die();
     }
 
     clearstatcache();
@@ -167,6 +175,7 @@ class sip
       if (!fwrite($fp, $this->min_port))
       {
         log::add('clientSIP','error',"Fail to write data to a lock file.");
+      die();
       }
       
       $this->src_port =  $this->min_port;
@@ -188,6 +197,7 @@ class sip
       if (!$src_port)
       {
         log::add('clientSIP','error',"No more ports left to bind.");
+      die();
       }
       
       $ports[] = $src_port;
@@ -195,6 +205,7 @@ class sip
       if (!fwrite($fp, implode(",",$ports)))
       {
         log::add('clientSIP','error',"Failed to write data to lock file.");
+      die();
       }
       
       $this->src_port = $src_port;
@@ -203,6 +214,7 @@ class sip
     if (!fclose($fp))
     {
       log::add('clientSIP','error',"Failed to close lock_file");
+      die();
     }
     
   }
@@ -218,6 +230,7 @@ class sip
     if (!$fp)
     {
       log::add('clientSIP','error',"Can't open lock file.");
+      die();
     }
     
     $canWrite = flock($fp, LOCK_EX);
@@ -225,6 +238,7 @@ class sip
     if (!$canWrite)
     {
       log::add('clientSIP','error',"Failed to lock a file in 1000 ms.");
+      die();
     }
     
     clearstatcache();
@@ -244,11 +258,13 @@ class sip
       if (!fclose($fp))
       {
         log::add('clientSIP','error',"Failed to close lock_file");
+      die();
       }
       
       if (!unlink($this->lock_file))
       {
         log::add('clientSIP','error',"Failed to delete lock_file.");
+      die();
       }
     }
     else
@@ -259,6 +275,7 @@ class sip
       if ($ports && !fwrite($fp, implode(",",$ports)))
       {
         log::add('clientSIP','error',"Failed to save data in lock_file");
+      die();
       }
       
       flock($fp, LOCK_UN);
@@ -266,6 +283,7 @@ class sip
       if (!fclose($fp))
       {
         log::add('clientSIP','error',"Failed to close lock_file");
+      die();
       }
     }
   }
@@ -288,6 +306,7 @@ class sip
     if (!preg_match('/sip:(.*)@/i',$this->from,$m))
     {
       log::add('clientSIP','error','Failed to parse From username.');
+      die();
     }
     
     $this->from_user = $m[1];
@@ -308,6 +327,7 @@ class sip
     if (!in_array($method,$this->allowed_methods))
     {
       log::add('clientSIP','error','Invalid method.');
+      die();
     }
     
     $this->method = $method;
@@ -357,6 +377,7 @@ class sip
       if (!preg_match('/^[0-9]+$/',$temp[1]))
       {
         log::add('clientSIP','error',"Invalid port number ".$temp[1]);
+      die();
       }
       
       $this->host = $temp[0];
@@ -376,11 +397,13 @@ class sip
     if (strpos($uri,'sip:') === false)
     {
       log::add('clientSIP','error',"Only sip: URI supported.");
+      die();
     }
     
     if (!$this->proxy && strpos($uri,'transport=tcp') !== false)
     {
       log::add('clientSIP','error',"Only UDP transport supported.");
+      die();
     }
     
     $this->uri = $uri;
@@ -413,6 +436,7 @@ class sip
       if (!$url = @parse_url($url))
       {
         log::add('clientSIP','error',"Failed to parse URI '$url'.");
+      die();
       }
       
       $this->host = $url['host'];
@@ -440,16 +464,19 @@ class sip
     if (!$this->from)
     {
       log::add('clientSIP','error','Missing From.');
+      die();
     }
     
     if (!$this->method)
     {
       log::add('clientSIP','error','Missing Method.');
+      die();
     }
     
     if (!$this->uri)
     {
       log::add('clientSIP','error','Missing URI.');
+      die();
     }
     
     $data = $this->formatRequest();
@@ -514,16 +541,19 @@ class sip
     if (!$this->host)
     {
       log::add('clientSIP','error',"Can't send data, host undefined");
+      die();
     }
     
     if (!$this->port)
     {
       log::add('clientSIP','error',"Can't send data, host undefined");
+      die();
     }
     
     if (!$data)
     {
       log::add('clientSIP','error',"Can't send - empty data");
+      die();
     }
     
     if (preg_match('/^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$/', $this->host))
@@ -537,6 +567,7 @@ class sip
       if ($ip_address == $this->host)
       {
         log::add('clientSIP','error',"DNS resolution of ".$this->host." failed");
+      die();
       }
     }
     
@@ -544,6 +575,7 @@ class sip
     {
       $err_no = socket_last_error($this->socket);
       log::add('clientSIP','error',"Failed to send data to ".$ip_address.":".$this->port.". Source IP ".$this->src_ip.", source port: ".$this->src_port.". ".socket_strerror($err_no));
+      die();
     }
     
     log::add('clientSIP','debug',$data);
@@ -585,6 +617,7 @@ class sip
         if ($i > 5)
         {
           log::add('clientSIP','error',"Unexpected request ".$this->req_method." received.");
+      die();
         }
       }
     }
@@ -601,6 +634,7 @@ class sip
     {
       $err_no = socket_last_error($this->socket);
       log::add('clientSIP','error',socket_strerror($err_no));
+      die();
     }
     
     $this->server_mode = $v;
@@ -614,6 +648,7 @@ class sip
     if (!@socket_recvfrom($this->socket, $this->rx_msg, 10000, 0, $from, $port))
     {
       $this->res_code = "No final response in ".round($this->fr_timer/1000,3)." seconds. (".socket_last_error($this->socket).")";
+      die();
       return $this->res_code;
     }
     
@@ -1063,11 +1098,13 @@ class sip
     if (!$this->username)
     {
       log::add('clientSIP','error',"Missing username");
+      die();
     }
     
     if (!$this->password)
     {
       log::add('clientSIP','error',"Missing password");
+      die();
     }
     
     // realm
@@ -1075,6 +1112,7 @@ class sip
     if (!preg_match('/^Proxy-Authenticate: .* realm="(.*)"/imU',$this->rx_msg, $m))
     {
       log::add('clientSIP','error',"Can't find realm in proxy-auth");
+      die();
     }
     
     $realm = $m[1];
@@ -1084,6 +1122,7 @@ class sip
     if (!preg_match('/^Proxy-Authenticate: .* nonce="(.*)"/imU',$this->rx_msg, $m))
     {
       log::add('clientSIP','error',"Can't find nonce in proxy-auth");
+      die();
     }
     
     $nonce = $m[1];
@@ -1100,11 +1139,13 @@ class sip
     if (!$this->username)
     {
       log::add('clientSIP','error',"Missing auth username");
+      die();
     }
     
     if (!$this->password)
     {
       log::add('clientSIP','error',"Missing auth password");
+      die();
     }
     
     $qop_present = false;
@@ -1116,6 +1157,7 @@ class sip
       if  (strpos($this->rx_msg,'qop="auth"') === false)
       {
         log::add('clientSIP','error','Only qop="auth" digest authentication supported.');
+      die();
       }
     }
     
@@ -1124,6 +1166,7 @@ class sip
     if (!preg_match('/^WWW-Authenticate: .* realm="(.*)"/imU',$this->rx_msg, $m))
     {
       log::add('clientSIP','error',"Can't find realm in www-auth");
+      die();
     }
     
     $realm = $m[1];
@@ -1133,6 +1176,7 @@ class sip
     if (!preg_match('/^WWW-Authenticate: .* nonce="(.*)"/imU',$this->rx_msg, $m))
     {
       log::add('clientSIP','error',"Can't find nonce in www-auth");
+      die();
     }
     
     $nonce = $m[1];
@@ -1165,18 +1209,21 @@ class sip
     if (!$this->src_ip)
     {
       log::add('clientSIP','error',"Source IP not defined.");
+      die();
     }
     
     if (!$this->socket = @socket_create(AF_INET, SOCK_DGRAM, SOL_UDP))
     {
       $err_no = socket_last_error($this->socket);
       log::add('clientSIP','error',socket_strerror($err_no));
+      die();
     }
     
     if (!@socket_bind($this->socket, $this->src_ip, $this->src_port))
     {
       $err_no = socket_last_error($this->socket);
       log::add('clientSIP','error',"Failed to bind ".$this->src_ip.":".$this->src_port." ".socket_strerror($err_no));
+      die();
     }
     
     $microseconds = $this->fr_timer * 1000;
@@ -1189,12 +1236,14 @@ class sip
     {
       $err_no = socket_last_error($this->socket);
       log::add('clientSIP','error',socket_strerror($err_no));
+      die();
     }
     
     if (!@socket_set_option($this->socket, SOL_SOCKET, SO_SNDTIMEO, array("sec"=>5,"usec"=>0)))
     {
       $err_no = socket_last_error($this->socket);
       log::add('clientSIP','error',socket_strerror($err_no));
+      die();
     }
   }
   private function closeSocket()
