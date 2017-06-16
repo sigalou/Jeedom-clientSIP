@@ -2,7 +2,6 @@
 require_once dirname(__FILE__) . '/../../../../core/php/core.inc.php';
 include_file('core', 'sip', 'class', 'clientSIP');
 class clientSIP extends eqLogic {
-	public $_sip=null;
 	public static function deamon_info() {
 		$return = array();
 		$return['log'] = 'clientSIP';
@@ -10,11 +9,9 @@ class clientSIP extends eqLogic {
 		$return['state'] = 'nok';
 		foreach(eqLogic::byType('clientSIP') as $clientSIP){
 			if($clientSIP->getIsEnable()){
-				//if($clientSIP->_sip == null)
-					//return $return;
-				/*$cron = cron::byClassAndFunction('clientSIP', 'ConnectSip', array('id' => $clientSIP->getId()));
+				$cron = cron::byClassAndFunction('clientSIP', 'ConnectSip', array('id' => $clientSIP->getId()));
 				if (!is_object($cron)) 	
-					return $return;*/
+					return $return;
 			}
 		}
 		$return['state'] = 'ok';
@@ -30,24 +27,7 @@ class clientSIP extends eqLogic {
 			return;
 		foreach(eqLogic::byType('clientSIP') as $clientSIP){
 			if($clientSIP->getIsEnable()){
-				$Host=config::byKey('Host', 'clientSIP');
-				$Port=config::byKey('Port', 'clientSIP');
-				$Username=$clientSIP->getConfiguration("Username");
-				$Password=$clientSIP->getConfiguration("Password");
-				try {
-					$clientSIP->checkAndUpdateCmd('RegStatus','En cours');
-					$clientSIP->_sip = new sip($Host);
-					$clientSIP->_sip->setUsername($Username);
-					$clientSIP->_sip->setPassword($Password);
-					$clientSIP->_sip->setMethod('REGISTER');
-					$clientSIP->_sip->setFrom('sip:'.$Username.'@'.$Host);
-					$clientSIP->_sip->setUri('sip:'.$Username.'@'.$Host);
-					$res = $clientSIP->_sip->send();
-					$clientSIP->checkAndUpdateCmd('RegStatus','Enregistrer');
-				} catch (Exception $e) {
-					die("Caught exception ".$e->getMessage."\n");
-				}
-				//$clientSIP->CreateDemon();   
+				$clientSIP->CreateDemon();   
 			}
 		}
 	}
@@ -109,6 +89,28 @@ class clientSIP extends eqLogic {
 		log::add('clientSIP', 'debug', 'Objet mis à jour => ' . json_encode($_option));
 		$clientSIP = Volets::byId($_option['id']);
 		if (is_object($clientSIP) && $clientSIP->getIsEnable()) {
+			$Host=config::byKey('Host', 'clientSIP');
+			$Port=config::byKey('Port', 'clientSIP');
+			$Username=$clientSIP->getConfiguration("Username");
+			$Password=$clientSIP->getConfiguration("Password");
+			try {
+				$clientSIP->checkAndUpdateCmd('RegStatus','En cours');
+				$sip = new sip($Host);
+				$sip->setUsername($Username);
+				$sip->setPassword($Password);
+				$sip->setMethod('REGISTER');
+				$sipsetFrom('sip:'.$Username.'@'.$Host);
+				$sip->setUri('sip:'.$Username.'@'.$Host);
+				$res = $sip->send();
+				log::add('clientSIP', 'debug', 'Retour => ' . $res);
+				$clientSIP->checkAndUpdateCmd('RegStatus','Enregistrer');
+				while(true){
+					//$sip->setMethod('REGISTER');
+					sleep(100);
+				}
+			} catch (Exception $e) {
+				die("Caught exception ".$e->getMessage."\n");
+			}
 			
 		}
 	}
@@ -127,7 +129,7 @@ class clientSIP extends eqLogic {
 		$Commande->setSubType($SubType);
 			if($Template !=''){
 			$Commande->setTemplate('dashboard',$Template);
-			$Commande->setTemplate('mobile','Bouteille');
+			$Commande->setTemplate('mobile',$Template);
 		}
 		$Commande->save();
 		return $Commande;
@@ -136,12 +138,28 @@ class clientSIP extends eqLogic {
 class clientSIPCmd extends cmd {
 	public function execute($_options = null){
 		switch($this->getLogicalId()){
-			case 'call':
+			case 'call':				
 				$this->getEqLogic()->checkAndUpdateCmd('CallStatus','Inactif');
-				/*$this->getEqLogic()->_sip->setMethod('INVITE');
-				$this->getEqLogic()->_sip->setUri('sip:'.$_options['message'].'@'.config::byKey('Host', 'clientSIP'));
-				$res = $this->getEqLogic()->_sip->send();*/
-				$this->getEqLogic()->checkAndUpdateCmd('CallStatus','Appel en cours');
+				$Host=config::byKey('Host', 'clientSIP');
+				$Port=config::byKey('Port', 'clientSIP');
+				$Username=$clientSIP->getEqLogic()->getConfiguration("Username");
+				$Password=$clientSIP->getEqLogic()->getConfiguration("Password");
+				try {
+					$clientSIP->checkAndUpdateCmd('RegStatus','En cours');
+					$sip = new sip($Host);
+					$sip->setUsername($Username);
+					$sip->setPassword($Password);
+					$sip->setMethod('INVITE');
+					$sipsetFrom('sip:'.$_options['message'].'@'.$Host);
+					$sip->setUri('sip:'.$_options['message'].'@'.$Host);
+					$res = $sip->send();
+					
+					log::add('clientSIP', 'debug', 'Retour => ' . $res);
+					$this->getEqLogic()->checkAndUpdateCmd('CallStatus','Appel en cours');
+
+				} catch (Exception $e) {
+					die("Caught exception ".$e->getMessage."\n");
+				}
 			break;
 		}
 	}
