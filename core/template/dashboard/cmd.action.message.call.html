@@ -61,7 +61,7 @@
 			</button>
 		</div>
 	</div>
-	<input type="text" name="number" id="numDisplay" class="form-control text-center input-sm" value="" placeholder="Saisir le numero SIP" autocomplete="off" />
+	<input type="text" name="number" id="numDisplay" class="form-control text-center input-sm" placeholder="Saisir le numero SIP" autocomplete="off" />
             
 </span>
 <script>
@@ -89,6 +89,7 @@
 	$(".cmd[data-cmd_id=#id#] .action").off();
 	$(".cmd[data-cmd_id=#id#] .action").on("click", function() {
 		var num = $('.cmd[data-cmd_id="id#] #numDisplay').val();
+		alert(num);
 		jeedom.cmd.execute({id: '#id#', value: {message:num}});
 	});
 </script>
