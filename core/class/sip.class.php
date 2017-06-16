@@ -127,21 +127,21 @@ class sip
     
     if ($this->min_port > $this->max_port)
     {
-      throw new PhpSIPException ("Min port is bigger than max port.");
+      log::add('clientSIP','error',"Min port is bigger than max port.");
     }
     
     $fp = @fopen($this->lock_file, 'a+');
     
     if (!$fp)
     {
-      throw new PhpSIPException ("Failed to open lock file ".$this->lock_file);
+     log::add('clientSIP','error',"Failed to open lock file ".$this->lock_file);
     }
     
     $canWrite = flock($fp, LOCK_EX);
     
     if (!$canWrite)
     {
-      throw new PhpSIPException ("Failed to lock a file in 1000 ms.");
+      log::add('clientSIP','error',"Failed to lock a file in 1000 ms.");
     }
 
     clearstatcache();
@@ -600,7 +600,7 @@ class sip
     if (!@socket_set_option($this->socket, SOL_SOCKET, SO_RCVTIMEO, array("sec"=>0,"usec"=>0)))
     {
       $err_no = socket_last_error($this->socket);
-      throw new PhpSIPException (socket_strerror($err_no));
+      log::add('clientSIP','error',socket_strerror($err_no));
     }
     
     $this->server_mode = $v;
@@ -1170,13 +1170,13 @@ class sip
     if (!$this->socket = @socket_create(AF_INET, SOCK_DGRAM, SOL_UDP))
     {
       $err_no = socket_last_error($this->socket);
-      throw new PhpSIPException (socket_strerror($err_no));
+      log::add('clientSIP','error',socket_strerror($err_no));
     }
     
     if (!@socket_bind($this->socket, $this->src_ip, $this->src_port))
     {
       $err_no = socket_last_error($this->socket);
-      throw new PhpSIPException ("Failed to bind ".$this->src_ip.":".$this->src_port." ".socket_strerror($err_no));
+      log::add('clientSIP','error',"Failed to bind ".$this->src_ip.":".$this->src_port." ".socket_strerror($err_no));
     }
     
     $microseconds = $this->fr_timer * 1000;
@@ -1188,13 +1188,13 @@ class sip
     if (!@socket_set_option($this->socket, SOL_SOCKET, SO_RCVTIMEO, array("sec"=>$sec,"usec"=>$usec)))
     {
       $err_no = socket_last_error($this->socket);
-      throw new PhpSIPException (socket_strerror($err_no));
+      log::add('clientSIP','error',socket_strerror($err_no));
     }
     
     if (!@socket_set_option($this->socket, SOL_SOCKET, SO_SNDTIMEO, array("sec"=>5,"usec"=>0)))
     {
       $err_no = socket_last_error($this->socket);
-      throw new PhpSIPException (socket_strerror($err_no));
+      log::add('clientSIP','error',socket_strerror($err_no));
     }
   }
   private function closeSocket()
