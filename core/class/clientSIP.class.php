@@ -161,15 +161,14 @@ class clientSIPCmd extends cmd {
 							$res = $sip->send();
 							
 							/*$sip->setMethod('BYE');
-						$sip->send();
+							$sip->send();
 
-						$sip->listen('NOTIFY');
-						$sip->reply(481,'Call Leg/Transaction Does Not Exist');*/
-
-
-					/*if ($res == 'No final response in 5 seconds.') {
-						$sip->setMethod('CANCEL');
-						$r
+							$sip->listen('NOTIFY');
+							$sip->reply(481,'Call Leg/Transaction Does Not Exist');*/
+							/*if ($res == 'No final response in 5 seconds.') {
+								$sip->setMethod('CANCEL');
+								$res = $sip->send();
+							}*/
 						break;
 						case '318':
 							$this->getEqLogic()->checkAndUpdateCmd('CallStatus','Sonnerie');
@@ -179,11 +178,6 @@ class clientSIPCmd extends cmd {
 							$this->getEqLogic()->checkAndUpdateCmd('CallStatus','Inactif');
 						break;
 					}
-
-
-						$res = $sip->send();
-					}*/
- 
 
 				} catch (Exception $e) {
 					die("Caught exception ".$e->getMessage."\n");
