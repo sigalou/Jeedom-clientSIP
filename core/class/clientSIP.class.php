@@ -136,9 +136,9 @@ class clientSIPCmd extends cmd {
 		switch($this->getLogicalId()){
 			case 'call':
 				$this->getEqLogic()->checkAndUpdateCmd('CallStatus','Inactif');
-				$this->getEqLogic()->_sip->setMethod('INVITE');
+				/*$this->getEqLogic()->_sip->setMethod('INVITE');
 				$this->getEqLogic()->_sip->setUri('sip:'.$_options['message'].'@'.config::byKey('Host', 'clientSIP'));
-				$res = $this->getEqLogic()->_sip->send();
+				$res = $this->getEqLogic()->_sip->send();*/
 				$this->getEqLogic()->checkAndUpdateCmd('CallStatus','Appel en cours');
 			break;
 		}
