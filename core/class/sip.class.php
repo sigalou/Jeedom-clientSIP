@@ -638,7 +638,7 @@ class sip
     {
       if (!$this->dialog)
       {
-        log::add('clientSIP','debug', "  New dialog: ".$this->from_tag.'.'.$this->to_tag.'.'.$this->call_id."\n";
+        log::add('clientSIP','debug', "  New dialog: ".$this->from_tag.'.'.$this->to_tag.'.'.$this->call_id);
       }
       
       $this->dialog = $this->from_tag.'.'.$this->to_tag.'.'.$this->call_id;
