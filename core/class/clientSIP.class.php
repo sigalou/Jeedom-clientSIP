@@ -145,7 +145,7 @@ class clientSIPCmd extends cmd {
 				$Password=$this->getEqLogic()->getConfiguration("Password");
 				try {
 					$this->getEqLogic()->checkAndUpdateCmd('CallStatus','Inactif');
-					$sip = new sip($Host);
+					/*$sip = new sip($Host);
 					$sip->setUsername($Username);
 					$sip->setPassword($Password);
 					$sip->setMethod('INVITE');
@@ -163,7 +163,33 @@ class clientSIPCmd extends cmd {
 							$sip=null;
 							$this->getEqLogic()->checkAndUpdateCmd('CallStatus','Inactif');
 						break;
+					}*/
+					$sip = new sip($Host);
+					$sip->setMethod('INVITE');
+					$sip->setFrom('sip:'.$Username.'@'.$Host);
+					$sip->setUri('sip:'.$Username.'@'.$Host);
+
+					$res = $sip->send();
+
+					if ($res == 200) { 
+						$this->getEqLogic()->checkAndUpdateCmd('CallStatus','Appel en cours');
+						$sip->setMethod('REFER');
+						$sip->addHeader('Refer-to: sip:'.$_options['message'].'@'.$Host);
+						$sip->addHeader('Referred-By: sip:'.$_options['message'].'@'.$Host);
+						$sip->send();
+
+						/*$sip->setMethod('BYE');
+						$sip->send();
+
+						$sip->listen('NOTIFY');
+						$sip->reply(481,'Call Leg/Transaction Does Not Exist');*/
 					}
+
+					/*if ($res == 'No final response in 5 seconds.') {
+						$sip->setMethod('CANCEL');
+						$res = $sip->send();
+					}*/
+ 
 
 				} catch (Exception $e) {
 					die("Caught exception ".$e->getMessage."\n");
