@@ -94,11 +94,11 @@ $(document).ready(function() {
     });
     $('#sldVolume').on('change', function() {
 
-        //var v      = $(this).val() / 100,
-            // player = $('audio').get()[0],
-           // btn    = $('#btnVol'),
-           // icon   = $('#btnVol').find('i'),
-          //  active = ctxSip.callActiveID;
+        var v      = $(this).val() / 100,
+             player = $('audio').get()[0],
+            btn    = $('#btnVol'),
+            icon   = $('#btnVol').find('i'),
+            active = '';
 
         // Set the object and media stream volumes
      //   if (ctxSip.Sessions[active]) {
