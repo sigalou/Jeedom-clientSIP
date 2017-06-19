@@ -101,9 +101,11 @@ class clientSIP extends eqLogic {
 				$sip->setMethod('REGISTER');
 				$sip->setFrom('sip:'.$Username.'@'.$Host/*.':'.$Port*/);
 				$sip->setUri('sip:'.$Username.'@'.$Host);
+				$sip->setServerMode(true);
 				$res = $sip->send();
 				log::add('clientSIP', 'debug', 'Retour => ' . $res);
 				$clientSIP->checkAndUpdateCmd('RegStatus','Enregistrer');
+				
 				$sip->listen('NOTIFY');
 			} catch (Exception $e) {
 				die("Caught exception ".$e->getMessage."\n");
