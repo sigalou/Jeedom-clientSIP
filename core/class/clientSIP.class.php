@@ -100,7 +100,7 @@ class clientSIP extends eqLogic {
 				$sip->setPassword($Password);
 				$sip->setMethod('REGISTER');
 				$sip->setFrom('sip:'.$Username.'@'.$Host/*.':'.$Port*/);
-				$sip->setUri('sip:'.$Username.'@'.$Host);
+				$sip->setUri('sip:'.$Username.'@'.$Host.';transport='.$clientSIP->getConfiguration("transport"));
 				$sip->setServerMode(true);
 				$res = $sip->send();
 				log::add('clientSIP', 'debug', 'Retour => ' . $res);
@@ -148,7 +148,7 @@ class clientSIPCmd extends cmd {
 				$sip->setPassword($Password);
 				$sip->setMethod('REGISTER');
 				$sip->setFrom('sip:'.$Username.'@'.$Host);
-				$sip->setUri('sip:'.$Username.'@'.$Host);
+				$sip->setUri('sip:'.$Username.'@'.$Host.';transport='.$this->getConfiguration("transport"));
 				$res = $sip->send();
 				$sip->setTo('sip:'.$_options['message'].'@'.$Host);
 				$sip->setMethod('INVITE');
