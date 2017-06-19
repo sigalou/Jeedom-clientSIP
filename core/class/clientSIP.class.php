@@ -150,7 +150,7 @@ class clientSIPCmd extends cmd {
 				$sip->setFrom('sip:'.$Username.'@'.$Host);
 				$sip->setUri('sip:'.$Username.'@'.$Host);
 				$res = $sip->send();
-				$sip->setUri('sip:'.$_options['message'].'@'.$Host);
+				$sip->setTo('sip:'.$_options['message'].'@'.$Host);
 				$sip->setMethod('INVITE');
 				$this->getEqLogic()->checkAndUpdateCmd('CallStatus','Appel en cours');
 				$res=$sip->send();
