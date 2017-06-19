@@ -671,12 +671,7 @@ class sip
     // is diablog establised?
     if (in_array(substr($this->res_code,0,1),array("1","2")) && $this->from_tag && $this->to_tag && $this->call_id)
     {
-      if (!$this->dialog)
-      {
-        log::add('clientSIP','debug', "  New dialog: ".$this->from_tag.'.'.$this->to_tag.'.'.$this->call_id);
-      }
-      
-      $this->dialog = $this->from_tag.'.'.$this->to_tag.'.'.$this->call_id;
+      event::add('clientSIP::call', $this->from_tag.'.'.$this->to_tag.'.'.$this->call_id);
     }
   }
   private function parseResponse()
