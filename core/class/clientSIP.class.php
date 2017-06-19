@@ -95,7 +95,7 @@ class clientSIP extends eqLogic {
 			$Password=$clientSIP->getConfiguration("Password");
 			try {
 				$clientSIP->checkAndUpdateCmd('RegStatus','En cours');
-				$sip = new sip();
+				$sip = new sip($Host);
 				$sip->setUsername($Username);
 				$sip->setPassword($Password);
 				$sip->setMethod('REGISTER');
@@ -145,7 +145,7 @@ class clientSIPCmd extends cmd {
 				$Password=$this->getEqLogic()->getConfiguration("Password");
 				try {
 					$this->getEqLogic()->checkAndUpdateCmd('CallStatus','Inactif');
-					$sip = new sip($Host,$Port);
+					$sip = new sip($Host);
 					$sip->setUsername($Username);
 					$sip->setPassword($Password);
 					$sip->setMethod('INVITE');
