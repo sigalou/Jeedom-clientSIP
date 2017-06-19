@@ -95,7 +95,7 @@ class clientSIP extends eqLogic {
 			$Password=$clientSIP->getConfiguration("Password");
 			try {
 				$clientSIP->checkAndUpdateCmd('RegStatus','En cours');
-				$sip = new sip($Host,$Port);
+				$sip = new sip();
 				$sip->setUsername($Username);
 				$sip->setPassword($Password);
 				$sip->setMethod('REGISTER');
