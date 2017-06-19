@@ -165,6 +165,21 @@ $eqLogics = eqLogic::byType('clientSIP');
 								<input type="password" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="Password" placeholder="{{Mots de passe}}"/>
 							</div>
 						</div>
+						<div class="form-group">
+							<label class="col-md-2 control-label" >
+								{{Transport}}
+								<sup>
+									<i class="fa fa-question-circle tooltips" title="Choisissez le type de transport" style="font-size : 1em;color:grey;"></i>
+								</sup>
+							</label>
+							<div class="col-md-3">
+								<select class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="transport">
+									<option value="udp">UDP</option>
+									<option value="tcp">TCP</option>
+									<option value="tls">TLS</option>
+								</select>
+							</div>
+						</div>
 					</fieldset> 
 				</form>
 			</div>
