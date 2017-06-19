@@ -142,45 +142,31 @@ class clientSIPCmd extends cmd {
 				$Port=config::byKey('Port', 'clientSIP');
 				$Username=$this->getEqLogic()->getConfiguration("Username");
 				$Password=$this->getEqLogic()->getConfiguration("Password");
-				try {
-					$this->getEqLogic()->checkAndUpdateCmd('CallStatus','Inactif');
-					$sip = new sip($Host);
-					$sip->setUsername($Username);
-					$sip->setPassword($Password);
-					$sip->setMethod('INVITE');
-					$sip->setFrom('sip:'.$Username.'@'.$Host/*.':'.$Port*/);
-					$sip->setUri('sip:'.$Username.'@'.$Host/*.':'.$Port*/);
-					$res = $sip->send();
-					switch($res){
-						case '200':
-							$this->getEqLogic()->checkAndUpdateCmd('CallStatus','Appel en cours');
-							$sip->setMethod('REFER');
-							$sip->addHeader('Refer-to: sip:'.$_options['message'].'@'.$Host/*.':'.$Port*/);
-							$sip->addHeader('Referred-By: sip:'.$_options['message'].'@'.$Host/*.':'.$Port*/);
-							$res = $sip->send();
-							
-							/*$sip->setMethod('BYE');
-							$sip->send();
-
-							$sip->listen('NOTIFY');
-							$sip->reply(481,'Call Leg/Transaction Does Not Exist');*/
-							/*if ($res == 'No final response in 5 seconds.') {
-								$sip->setMethod('CANCEL');
-								$res = $sip->send();
-							}*/
-						break;
-						case '318':
-							$this->getEqLogic()->checkAndUpdateCmd('CallStatus','Sonnerie');
-						break;
-						default:
-							$sip=null;
-							$this->getEqLogic()->checkAndUpdateCmd('CallStatus','Inactif');
-						break;
-					}
-
-				} catch (Exception $e) {
-					die("Caught exception ".$e->getMessage."\n");
+				$this->getEqLogic()->checkAndUpdateCmd('CallStatus','Inactif');
+				$sip = new sip($Host);
+				$sip->setUsername($Username);
+				$sip->setPassword($Password);
+				$sip->setMethod('REGISTER');
+				$sip->setFrom('sip:'.$Username.'@'.$Host);
+				$sip->setUri('sip:'.$Username.'@'.$Host);
+				$res = $sip->send();
+				$sip->setUri('sip:'.$_options['message'].'@'.$Host);
+				$sip->setMethod('INVITE');
+				$this->getEqLogic()->checkAndUpdateCmd('CallStatus','Appel en cours');
+				$res=$sip->send();
+				switch($res){
+					case '200':
+						$this->getEqLogic()->checkAndUpdateCmd('CallStatus','Décroché');
+					break;
+					case '318':
+						$this->getEqLogic()->checkAndUpdateCmd('CallStatus','Sonnerie');
+					break;
+					default:
+						$sip=null;
+						$this->getEqLogic()->checkAndUpdateCmd('CallStatus','Inactif');
+					break;
 				}
+
 			break;
 		}
 	}
