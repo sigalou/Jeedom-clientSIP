@@ -148,7 +148,7 @@ class clientSIPCmd extends cmd {
 				$sip->setPassword($Password);
 				$sip->setMethod('REGISTER');
 				$sip->setFrom('sip:'.$Username.'@'.$Host);
-				$sip->setUri('sip:'.$Username.'@'.$Host.';transport='.$this->getConfiguration("transport"));
+				$sip->setUri('sip:'.$Username.'@'.$Host.';transport='.$this->getEqLogic()->getConfiguration("transport"));
 				$res = $sip->send();
 				$sip->setTo('sip:'.$_options['message'].'@'.$Host);
 				$sip->setMethod('INVITE');
