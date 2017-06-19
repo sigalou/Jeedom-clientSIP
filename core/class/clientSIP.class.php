@@ -99,8 +99,8 @@ class clientSIP extends eqLogic {
 				$sip->setUsername($Username);
 				$sip->setPassword($Password);
 				$sip->setMethod('REGISTER');
-				$sip->setFrom('sip:'.$Username.'@'.$Host.':'.$Port);
-				$sip->setUri('sip:'.$Username.'@'.$Host.':'.$Port);
+				$sip->setFrom('sip:'.$Username.'@'.$Host/*.':'.$Port*/);
+				$sip->setUri('sip:'.$Username.'@'.$Host);
 				$res = $sip->send();
 				log::add('clientSIP', 'debug', 'Retour => ' . $res);
 				$clientSIP->checkAndUpdateCmd('RegStatus','Enregistrer');
@@ -149,15 +149,15 @@ class clientSIPCmd extends cmd {
 					$sip->setUsername($Username);
 					$sip->setPassword($Password);
 					$sip->setMethod('INVITE');
-					$sip->setFrom('sip:'.$Username.'@'.$Host.':'.$Port);
-					$sip->setUri('sip:'.$Username.'@'.$Host.':'.$Port);
+					$sip->setFrom('sip:'.$Username.'@'.$Host/*.':'.$Port*/);
+					$sip->setUri('sip:'.$Username.'@'.$Host/*.':'.$Port*/);
 					$res = $sip->send();
 					switch($res){
 						case '200':
 							$this->getEqLogic()->checkAndUpdateCmd('CallStatus','Appel en cours');
 							$sip->setMethod('REFER');
-							$sip->addHeader('Refer-to: sip:'.$_options['message'].'@'.$Host.':'.$Port);
-							$sip->addHeader('Referred-By: sip:'.$_options['message'].'@'.$Host.':'.$Port);
+							$sip->addHeader('Refer-to: sip:'.$_options['message'].'@'.$Host/*.':'.$Port*/);
+							$sip->addHeader('Referred-By: sip:'.$_options['message'].'@'.$Host/*.':'.$Port*/);
 							$res = $sip->send();
 							
 							/*$sip->setMethod('BYE');
