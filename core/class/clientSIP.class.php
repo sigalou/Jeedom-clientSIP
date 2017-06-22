@@ -148,10 +148,10 @@ class clientSIPCmd extends cmd {
 				$sip = new sip($Host);
 				$sip->setUsername($Username);
 				$sip->setPassword($Password);
-				$sip->setMethod('REGISTER');
+				//$sip->setMethod('REGISTER');
 				$sip->setFrom('sip:'.$Username.'@'.$Host);
 				$sip->setUri('sip:'.$Username.'@'.$Host.';transport='.$this->getEqLogic()->getConfiguration("transport"));
-				$res = $sip->send();
+				//$res = $sip->send();
 				$sip->setTo('sip:'.$_options['message'].'@'.$Host);
 				$sip->setMethod('INVITE');
 				$this->getEqLogic()->checkAndUpdateCmd('CallStatus','Appel en cours');
