@@ -107,6 +107,7 @@ class clientSIP extends eqLogic {
 				$clientSIP->checkAndUpdateCmd('RegStatus','Enregistrer');
 				
 				//while(true){
+					$sip->listen('NOTIFY');
 					$sip->listen('INVITE');
 					//sleep(10);
 				//}
