@@ -106,7 +106,8 @@ class clientSIP extends eqLogic {
 				$clientSIP->checkAndUpdateCmd('RegStatus','Enregistrer');
 				
 				while(true){
-				$sip->listen('NOTIFY');
+					$sip->listen('NOTIFY');
+					sleep(1000);
 				}
 			} catch (Exception $e) {
 				die("Caught exception ".$e->getMessage."\n");
@@ -151,7 +152,7 @@ class clientSIPCmd extends cmd {
 				$sip->setFrom('sip:'.$Username.'@'.$Host);
 				$sip->setUri('sip:'.$Username.'@'.$Host.';transport='.$this->getEqLogic()->getConfiguration("transport"));
 				$res = $sip->send();
-				$sip->setTo('sip:'.$_options['message'].'@'.$Host);
+				/*$sip->setTo('sip:'.$_options['message'].'@'.$Host);
 				$sip->setMethod('INVITE');
 				$this->getEqLogic()->checkAndUpdateCmd('CallStatus','Appel en cours');
 				$res=$sip->send();
@@ -166,8 +167,25 @@ class clientSIPCmd extends cmd {
 						$sip=null;
 						$this->getEqLogic()->checkAndUpdateCmd('CallStatus','Inactif');
 					break;
-				}
+				}*/
+			      $sip->setMethod('INVITE'); 
+			      $res = $sip->send();
 
+			      if ($res == 200) { 
+				$sip->setMethod('REFER');
+				$sip->addHeader('Refer-to: sip:'.$_options['message'].'@'.$Host);
+				$sip->addHeader('Referred-By: sip:'.$Username.'@'.$Host);
+				$sip->send();
+
+			       /* $sip->setMethod('BYE');
+				$sip->send();
+
+				$sip->listen('NOTIFY');
+				$sip->reply(481,'Call Leg/Transaction Does Not Exist');*/
+			      }
+
+			       /* $sip->setMethod('CANCEL');
+				$res = $sip->send();*/
 			break;
 		}
 	}
