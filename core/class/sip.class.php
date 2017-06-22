@@ -578,7 +578,7 @@ class sip
       die();
     }
     
-    log::add('clientSIP','debug',$data);
+    log::add('clientSIP','info','TX : '.$data);
       
   }
   public function listen($methods)
@@ -652,7 +652,7 @@ class sip
       return $this->res_code;
     }
     
-    log::add('clientSIP','debug',$this->rx_msg);
+    log::add('clientSIP','info','RX: '.$this->rx_msg);
     
     // Response
     $m = array();
