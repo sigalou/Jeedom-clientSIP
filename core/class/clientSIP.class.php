@@ -106,10 +106,10 @@ class clientSIP extends eqLogic {
 				$res = $sip->send();
 				$clientSIP->checkAndUpdateCmd('RegStatus','Enregistrer');
 				
-				while(true){
-					$sip->listen('NOTIFY');
-					sleep(10);
-				}
+				//while(true){
+					$sip->listen('INVITE');
+					//sleep(10);
+				//}
 			} catch (Exception $e) {
 				die("Caught exception ".$e->getMessage."\n");
 			}
