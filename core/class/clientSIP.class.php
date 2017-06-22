@@ -99,6 +99,7 @@ class clientSIP extends eqLogic {
 				$sip->setUsername($Username);
 				$sip->setPassword($Password);
 				$sip->setMethod('REGISTER');
+				$sip->setProxy($Host.':'.$Port)
 				$sip->setFrom('sip:'.$Username.'@'.$Host/*.':'.$Port*/);
 				$sip->setUri('sip:'.$Username.'@'.$Host.';transport='.$clientSIP->getConfiguration("transport"));
 				$sip->setServerMode(true);
@@ -148,6 +149,7 @@ class clientSIPCmd extends cmd {
 				$sip = new sip($Host);
 				$sip->setUsername($Username);
 				$sip->setPassword($Password);
+				$sip->setProxy($Host.':'.$Port)
 				//$sip->setMethod('REGISTER');
 				$sip->setFrom('sip:'.$Username.'@'.$Host);
 				$sip->setUri('sip:'.$Username.'@'.$Host.';transport='.$this->getEqLogic()->getConfiguration("transport"));
