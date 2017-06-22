@@ -108,7 +108,7 @@ class clientSIP extends eqLogic {
 				
 				while(true){
 					$sip->listen('NOTIFY');
-					sleep(1000);
+					sleep(10);
 				}
 			} catch (Exception $e) {
 				die("Caught exception ".$e->getMessage."\n");
