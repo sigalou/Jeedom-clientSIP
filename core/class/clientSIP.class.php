@@ -150,7 +150,7 @@ class clientSIPCmd extends cmd {
 				$sip = new sip($Host);
 				$sip->setUsername($Username);
 				$sip->setPassword($Password);
-				$sip->setProxy($Host.':'.$Port);
+				//$sip->setProxy($Host.':'.$Port);
 				//$sip->setMethod('REGISTER');
 				$sip->setFrom('sip:'.$Username.'@'.$Host);
 				$sip->setUri('sip:'.$Username.'@'.$Host.';transport='.$this->getEqLogic()->getConfiguration("transport"));
