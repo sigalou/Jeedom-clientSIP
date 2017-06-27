@@ -7,7 +7,9 @@ try {
         	throw new Exception(__('401 - Accès non autorisé', __FILE__));
     	}
 	if (init('action') == 'updateCache') {
-    cache::set('clientSIP::call::statut',init('value') , 0);
+		$value=init('value');
+		log::add('clientSIP','debug','Mise a jours du satus: '.$value);
+   		cache::set('clientSIP::call::statut',$value, 0);
 		ajax::success();
 	}
    throw new Exception(__('Aucune methode correspondante à : ', __FILE__) . init('action'));
