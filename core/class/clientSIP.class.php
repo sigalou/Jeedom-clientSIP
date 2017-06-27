@@ -93,7 +93,7 @@ class clientSIP extends eqLogic {
 			$Port=config::byKey('Port', 'clientSIP');
 			$Username=$clientSIP->getConfiguration("Username");
 			$Password=$clientSIP->getConfiguration("Password");
-			try {
+			try {			
 				$clientSIP->checkAndUpdateCmd('RegStatus','En cours');
 				$sip = new sip($Host);
 				$sip->setUsername($Username);
@@ -105,12 +105,15 @@ class clientSIP extends eqLogic {
 				$sip->setServerMode(true);
 				$res = $sip->send();
 				$clientSIP->checkAndUpdateCmd('RegStatus','Enregistrer');
-				
-				//while(true){
-					$sip->listen('NOTIFY');
-					$sip->listen('INVITE');
-					//sleep(10);
-				//}
+				$sip->listen('NOTIFY');
+				$sip->listen('INVITE');
+       		  		$sip->reply(180,'Sonnerie');
+				$clientSIP->checkAndUpdateCmd('CallStatus','Sonnerie');
+              			event::add('clientSIP::call', 'Sonnerie');
+                		$cache = cache::set('clientSIP::call::statut', 'Sonnerie', 0);
+				while($cache->getValue(true) != 'Reponse'){}
+				$sip->reply(200,'Ok');
+				$clientSIP->checkAndUpdateCmd('CallStatus','Décroché');
 			} catch (Exception $e) {
 				die("Caught exception ".$e->getMessage."\n");
 			}
