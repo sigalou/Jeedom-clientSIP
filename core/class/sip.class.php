@@ -12,7 +12,7 @@ class sip
   private $server_mode = false;
   private $dialog = false;
   private $socket;
-  private $src_ip;
+  private $src_ip;e
   private $user_agent = 'PHP SIP';
   private $cseq = 20;
   private $src_port;
@@ -669,10 +669,10 @@ class sip
     }
     
     // is diablog establised?
-    if (in_array(substr($this->res_code,0,1),array("1","2")) && $this->from_tag && $this->to_tag && $this->call_id)
+   /* if (in_array(substr($this->res_code,0,1),array("1","2")) && $this->from_tag && $this->to_tag && $this->call_id)
     {
       event::add('clientSIP::call', $this->from_tag.'.'.$this->to_tag.'.'.$this->call_id);
-    }
+    }*/
   }
   private function parseResponse()
   {
