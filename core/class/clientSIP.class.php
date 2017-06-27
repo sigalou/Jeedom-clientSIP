@@ -105,20 +105,33 @@ class clientSIP extends eqLogic {
 				$sip->setServerMode(true);
 				$res = $sip->send();
 				$clientSIP->checkAndUpdateCmd('RegStatus','Enregistrer');
-				$sip->listen('NOTIFY');
-				$sip->listen('INVITE');
-       		  		$sip->reply(180,'Sonnerie');
-				$clientSIP->checkAndUpdateCmd('CallStatus','Sonnerie');
-				$array = utils::o2a($clientSIP);
-              			event::add('clientSIP::call', $array);
-                		$cache = cache::set('clientSIP::call::statut', 'Sonnerie', 0);
-				while($cache->getValue(true) != 'Reponse'){}
-				$sip->reply(200,'Ok');
-				$clientSIP->checkAndUpdateCmd('CallStatus','Décroché');
+				while(true){
+					$sip->listen('NOTIFY');
+					$sip->listen('INVITE');
+					$clientSIP->RepondreAppel($sip);
+				}
 			} catch (Exception $e) {
 				die("Caught exception ".$e->getMessage."\n");
 			}
 			
+		}
+	}
+	public function RepondreAppel($sip) {
+		$sip->reply(180,'Sonnerie');
+		$this->checkAndUpdateCmd('CallStatus','Sonnerie');
+		event::add('clientSIP::call', utils::o2a($this));
+		$cache = cache::set('clientSIP::call::statut', 'Sonnerie', 0);
+		while(true){
+			switch($cache->getValue(true)){
+				case 'Decrocher':
+					$sip->reply(200,'Ok');
+					$this->checkAndUpdateCmd('CallStatus','Décroché');
+					//Lancer les actions message, audio, video
+				break;
+				case 'Racrocher':
+					$this->checkAndUpdateCmd('CallStatus','Racrocher');
+				return;
+			}
 		}
 	}
 	public function AddCommande($Name,$_logicalId,$Type="info", $SubType='string',$Template='') {
