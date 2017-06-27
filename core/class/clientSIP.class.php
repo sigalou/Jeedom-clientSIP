@@ -117,18 +117,21 @@ class clientSIP extends eqLogic {
 		}
 	}
 	public function RepondreAppel($sip) {
+		$sip->reply(100,'Attente');
 		$sip->reply(180,'Sonnerie');
 		$this->checkAndUpdateCmd('CallStatus','Sonnerie');
 		event::add('clientSIP::call', utils::o2a($this));
-		$cache = cache::set('clientSIP::call::statut', 'Sonnerie', 0);
+		cache::set('clientSIP::call::statut', 'Sonnerie', 0);
 		while(true){
+      			$cache = cache::byKey('clientSIP::call::statut');
 			switch($cache->getValue(true)){
 				case 'Decrocher':
 					$sip->reply(200,'Ok');
-					$this->checkAndUpdateCmd('CallStatus','Décroché');
-					//Lancer les actions message, audio, video
+					$this->checkAndUpdateCmd('CallStatus','Communication en cours');
+					event::add('clientSIP::rtp', utils::o2a($this));
 				break;
 				case 'Racrocher':
+					$sip->reply(603,'Decline');
 					$this->checkAndUpdateCmd('CallStatus','Racrocher');
 				return;
 			}
