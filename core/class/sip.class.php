@@ -12,7 +12,7 @@ class sip
   private $server_mode = false;
   private $dialog = false;
   private $socket;
-  private $src_ip;e
+  private $src_ip;
   private $user_agent = 'PHP SIP';
   private $cseq = 20;
   private $src_port;
