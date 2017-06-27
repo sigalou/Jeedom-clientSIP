@@ -19,6 +19,8 @@
 		}
 	});
 });
+$('body').on('clientSIP::rtp', function (_event,_options) {
+});
 function updateCache(reponse){
 	$.ajax({
 		type: 'POST',            
