@@ -109,7 +109,8 @@ class clientSIP extends eqLogic {
 				$sip->listen('INVITE');
        		  		$sip->reply(180,'Sonnerie');
 				$clientSIP->checkAndUpdateCmd('CallStatus','Sonnerie');
-              			event::add('clientSIP::call', 'Sonnerie');
+				$array = utils::o2a($clientSIP);
+              			event::add('clientSIP::call', $array);
                 		$cache = cache::set('clientSIP::call::statut', 'Sonnerie', 0);
 				while($cache->getValue(true) != 'Reponse'){}
 				$sip->reply(200,'Ok');
