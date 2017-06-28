@@ -128,6 +128,7 @@ class clientSIP extends eqLogic {
 			switch($cache->getValue(true)){
 				case 'Decrocher':
 					$sip->reply(200,'Ok');
+					cache::set('clientSIP::call::statut', 'Communication', 0);
 					$this->checkAndUpdateCmd('CallStatus','Communication en cours');
 					event::add('clientSIP::rtp', utils::o2a($this));
 				break;
