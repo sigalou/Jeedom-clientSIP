@@ -1,7 +1,14 @@
  $('body').on('clientSIP::call', function (_event,_options) {
+	Call('Un appel est en cours, voulez vous répondre');
+});
+$('body').on('clientSIP::rtp', function (_event,_options) {
+	var message=$('<div>');
+	Call(message);
+});
+function Call(message){
 	bootbox.dialog({
-		title: "{{Ajout d'une nouvelle condition}}",
-		message: 'Un appel est en cours, voulez vous répondre',
+		title: "{{Appel en cours}}",
+		message: message,
 		buttons: {
 			"Racrocher": {
 				className: "btn-danger",
@@ -18,9 +25,7 @@
 			},
 		}
 	});
-});
-$('body').on('clientSIP::rtp', function (_event,_options) {
-});
+}
 function updateCache(reponse){
 	$.ajax({
 		type: 'POST',            
