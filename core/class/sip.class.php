@@ -13,7 +13,7 @@ class sip
   private $dialog = false;
   private $socket;
   private $src_ip;
-  private $user_agent = 'PHP SIP';
+  private $user_agent = 'Jeedom';
   private $cseq = 20;
   private $src_port;
   private $call_id;
