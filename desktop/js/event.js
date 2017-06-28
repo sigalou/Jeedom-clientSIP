@@ -2,7 +2,10 @@
 	Call('Un appel est en cours, voulez vous répondre');
 });
 $('body').on('clientSIP::rtp', function (_event,_options) {
-	var message=$('<div>');
+	var message=$('<div>')
+		.append($('<video>')
+			.attr('src','')
+			.text('Votre navigateur ne supporte pas la VIDEO ou le RTP stream'));
 	Call(message);
 });
 function Call(message){
