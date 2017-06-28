@@ -106,7 +106,8 @@ class clientSIP extends eqLogic {
 				$res = $sip->send();
 				$clientSIP->checkAndUpdateCmd('RegStatus','Enregistrer');
 				while(true){
-					$sip->listen('NOTIFY');
+					//$sip->listen('NOTIFY');
+					$sip->newCall();
 					$sip->listen('INVITE');
 					$clientSIP->RepondreAppel($sip);
 				}
@@ -117,7 +118,7 @@ class clientSIP extends eqLogic {
 		}
 	}
 	public function RepondreAppel($sip) {
-		$sip->reply(100,'Attente');
+		//$sip->reply(100,'Attente');
 		$sip->reply(180,'Sonnerie');
 		$this->checkAndUpdateCmd('CallStatus','Sonnerie');
 		event::add('clientSIP::call', utils::o2a($this));
