@@ -798,6 +798,11 @@ class sip
         $this->call_id = trim($m[1]);
       }
     }
+    // ACK 2XX-6XX - only invites - RFC3261 17.1.2.1
+    if ($this->res_cseq_method == 'INVITE' && in_array(substr($this->res_code,0,1),array('2','3','4','5','6')))
+    {
+      $this->ack();
+    }
   }
   public function reply($code, $text)
   {
