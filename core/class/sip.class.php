@@ -676,6 +676,7 @@ class sip
   }
   private function parseResponse()
   {
+    log::add('clientSIP','debug','parseResponse');
     // Request via
     $m = array();
     $this->req_via = array();
@@ -714,6 +715,7 @@ class sip
   }
   private function parseRequest()
   {
+    log::add('clientSIP','debug','parseRequest');
     $temp = explode("\r\n",$this->rx_msg);
     $temp = explode(" ",$temp[0]);
     
