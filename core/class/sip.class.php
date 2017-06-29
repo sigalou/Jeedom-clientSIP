@@ -676,7 +676,6 @@ class sip
   }
   private function parseResponse()
   {
-    log::add('clientSIP','debug','parseResponse');
     // Request via
     $m = array();
     $this->req_via = array();
@@ -715,7 +714,6 @@ class sip
   }
   private function parseRequest()
   {
-    log::add('clientSIP','debug','parseRequest');
     $temp = explode("\r\n",$this->rx_msg);
     $temp = explode(" ",$temp[0]);
     
@@ -800,11 +798,7 @@ class sip
         $this->call_id = trim($m[1]);
       }
     }
-    // ACK 2XX-6XX - only invites - RFC3261 17.1.2.1
-    if ($this->res_cseq_method == 'INVITE' && in_array(substr($this->res_code,0,1),array('2','3','4','5','6')))
-    {
-      $this->ack();
-    }
+     $this->ack();
   }
   public function reply($code, $text)
   {
