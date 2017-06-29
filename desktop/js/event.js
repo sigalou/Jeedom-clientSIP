@@ -1,12 +1,16 @@
  $('body').on('clientSIP::call', function (_event,_options) {
-	Call('Un appel est en cours, voulez vous répondre');
+	 if(document[hidden]) {} else {
+		Call('Un appel est en cours, voulez vous répondre');
+	}
 });
 $('body').on('clientSIP::rtp', function (_event,_options) {
 	var message=$('<div>')
 		.append($('<video>')
 			.attr('src','')
 			.text('Votre navigateur ne supporte pas la VIDEO ou le RTP stream'));
-	Call(message);
+	if(document[hidden]) {} else {
+		Call(message);
+	}
 });
 function Call(message){
 	bootbox.dialog({
