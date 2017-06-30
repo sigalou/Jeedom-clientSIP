@@ -1,7 +1,5 @@
- $('body').on('clientSIP::call', function (_event,_options) {
-	 if(document[hidden]) {} else {
-		Call('Un appel est en cours, voulez vous répondre');
-	}
+$('body').on('clientSIP::call', function (_event,_options) {
+	Call('Un appel est en cours, voulez vous répondre');
 });
 $('body').on('clientSIP::rtp', function (_event,_options) {
 	var message=$('<div>')
