@@ -798,7 +798,6 @@ class sip
         $this->call_id = trim($m[1]);
       }
     }
-     $this->ack();
   }
   public function reply($code, $text)
   {
