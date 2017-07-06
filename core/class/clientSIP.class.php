@@ -118,7 +118,7 @@ class clientSIP extends eqLogic {
 		}
 	}
 	public function RepondreAppel($sip) {
-		$sip->reply(100,'Trying');
+		//$sip->reply(100,'Trying');
 		$sip->reply(180,'Ringing');
 		$this->checkAndUpdateCmd('CallStatus','Sonnerie');
 		event::add('clientSIP::call', utils::o2a($this));
@@ -127,13 +127,16 @@ class clientSIP extends eqLogic {
       			$cache = cache::byKey('clientSIP::call::statut');
 			switch($cache->getValue(true)){
 				case 'Decrocher':
+					//ajouter les options de compatibilité de jeedom
 					$sip->reply(200,'Ok');
 					cache::set('clientSIP::call::statut', 'Communication', 0);
 					$this->checkAndUpdateCmd('CallStatus','Communication en cours');
 					event::add('clientSIP::rtp', utils::o2a($this));
 				break;
 				case 'Racrocher':
-					$sip->reply(603,'Decline');
+					//$sip->reply(603,'Decline');
+					$sip->setMethod('CANCEL');
+					$sip->send();
 					$this->checkAndUpdateCmd('CallStatus','Racrocher');
 				return;
 			}
