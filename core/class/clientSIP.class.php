@@ -118,8 +118,8 @@ class clientSIP extends eqLogic {
 		}
 	}
 	public function RepondreAppel($sip) {
-		//$sip->reply(100,'Attente');
-		$sip->reply(180,'Sonnerie');
+		$sip->reply(100,'Trying');
+		$sip->reply(180,'Ringing');
 		$this->checkAndUpdateCmd('CallStatus','Sonnerie');
 		event::add('clientSIP::call', utils::o2a($this));
 		cache::set('clientSIP::call::statut', 'Sonnerie', 0);
