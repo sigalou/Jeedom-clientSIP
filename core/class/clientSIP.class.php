@@ -87,7 +87,7 @@ class clientSIP extends eqLogic {
 	}
 	public static function ConnectSip($_option){
 		log::add('clientSIP', 'debug', 'Objet mis à jour => ' . json_encode($_option));
-		$clientSIP = Volets::byId($_option['id']);
+		$clientSIP = clientSIP::byId($_option['id']);
 		if (is_object($clientSIP) && $clientSIP->getIsEnable()) {
 			$Host=config::byKey('Host', 'clientSIP');
 			$Port=config::byKey('Port', 'clientSIP');
