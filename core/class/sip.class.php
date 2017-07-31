@@ -9,6 +9,7 @@ class sip
   private $allowed_methods = array(
     "CANCEL","NOTIFY", "INVITE","BYE","REFER","OPTIONS","SUBSCRIBE","MESSAGE", "PUBLISH", "REGISTER"
   );
+  private $server;
   private $server_mode = false;
   private $dialog = false;
   private $socket;
@@ -751,13 +752,17 @@ class sip
     $this->req_cseq_method = $this->parseCSeqMethod();
 
     // Request CSeq number
-    $m = array();
-    
+    $m = array(); 
     if (preg_match('/^CSeq: ([0-9]+)/im', $this->rx_msg, $m))
     {
       $this->req_cseq_number = trim($m[1]);
     }
-
+    // Server Name
+    $m = array(); 
+    if (preg_match('/^Server:/im', $this->rx_msg, $m))
+    {
+      $this->server = trim($m[1]);
+    }
     // Request From
     $m = array();
     if (preg_match('/^From: (.*)/im', $this->rx_msg, $m))
@@ -877,7 +882,11 @@ class sip
     {
       $a.= 'To: '.$this->to."\r\n";
     }
-    
+    //Server
+    if($this->server)
+    {
+      $a.= 'Server: '.$this->server."\r\n";
+    }
     // Call-ID
     if (!$this->call_id)
     {
@@ -950,6 +959,11 @@ class sip
       $r.= 'To: '.$this->to."\r\n";
     }
     
+    //Server
+    if($this->server)
+    {
+      $a.= 'Server: '.$this->server."\r\n";
+    }
     // Authentication
     if ($this->auth)
     {
