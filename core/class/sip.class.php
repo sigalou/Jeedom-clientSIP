@@ -839,9 +839,30 @@ class sip
     //CSeq
     $r.= 'CSeq: '.$this->req_cseq_number.' '.$this->req_cseq_method."\r\n";
     
-    // Max-Forwards
-    $r.= 'Max-Forwards: 70'."\r\n";
+    //Server
+    if($this->server)
+    {
+      $r.= 'Server: '.$this->server."\r\n";
+    }
     
+    $r.= "Allow: INVITE, ACK, CANCEL, OPTIONS, BYE, REFER, SUBSCRIBE, NOTIFY, INFO, PUBLISH, MESSAGE\r\n";
+    $r.= "Supported: replaces, timer\r\n";
+    
+    // Max-Forwards
+    //$r.= 'Max-Forwards: 70'."\r\n";
+     // Contact
+    if ($this->contact)
+    {
+      if (substr($this->contact,0,1) == "<") {
+        $r.= 'Contact: '.$this->contact."\r\n";
+      } else {
+        $r.= 'Contact: <'.$this->contact.'>'."\r\n";
+      }
+    }
+    else if ($this->method != 'MESSAGE')
+    {
+      $r.= 'Contact: <sip:'.$this->from_user.'@'.$this->src_ip.':'.$this->src_port.'>'."\r\n";
+    }
     // User-Agent
     $r.= 'User-Agent: '.$this->user_agent."\r\n";
     
