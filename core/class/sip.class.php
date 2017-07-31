@@ -702,7 +702,7 @@ class sip
     
     // Server Name
     $m = array(); 
-    if (preg_match('/^Server:/im', $this->rx_msg, $m))
+    if (preg_match('/^Server: .*/im', $this->rx_msg, $m))
     {
       $this->server = trim($m[0]);
       log::add('clientSIP','debug','Server: '.json_encode($m));
