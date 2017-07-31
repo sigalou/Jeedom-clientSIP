@@ -6,6 +6,5 @@
 	"require" : "2.4",
 	"display" : "panel",
 	"category" : "communication",
-	"eventjs" : 1,
 	"hasOwnDeamon" : true
 }
