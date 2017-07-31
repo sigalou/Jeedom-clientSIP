@@ -705,6 +705,7 @@ class sip
     if (preg_match('/^Server:/im', $this->rx_msg, $m))
     {
       $this->server = trim($m[1]);
+      log::add('clientSIP','debug','Server: '.$this->server);
     }
     // Response contact
     $this->res_contact = $this->parseContact();
@@ -768,6 +769,7 @@ class sip
     if (preg_match('/^Server:/im', $this->rx_msg, $m))
     {
       $this->server = trim($m[1]);
+      log::add('clientSIP','debug','Server: '.$this->server);
     }
     // Request From
     $m = array();
@@ -968,7 +970,7 @@ class sip
     //Server
     if($this->server)
     {
-      $a.= 'Server: '.$this->server."\r\n";
+      $r.= 'Server: '.$this->server."\r\n";
     }
     // Authentication
     if ($this->auth)
