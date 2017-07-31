@@ -702,9 +702,9 @@ class sip
     
     // Server Name
     $m = array(); 
-    if (preg_match('/^Server: .*/im', $this->rx_msg, $m))
+    if (preg_match('/^Server: (.*)/im', $this->rx_msg, $m))
     {
-      $this->server = trim($m[0]);
+      $this->server = trim($m[1]);
       log::add('clientSIP','debug','Server: '.json_encode($m));
     }
     // Response contact
@@ -766,9 +766,9 @@ class sip
     }
     // Server Name
     $m = array(); 
-    if (preg_match('/^Server:/im', $this->rx_msg, $m))
+    if (preg_match('/^Server: (.*)/im', $this->rx_msg, $m))
     {
-      $this->server = trim($m[0]);
+      $this->server = trim($m[1]);
       log::add('clientSIP','debug','Server: '.json_encode($m));
     }
     // Request From
