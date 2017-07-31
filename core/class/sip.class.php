@@ -342,9 +342,9 @@ class sip
       $body.= "t=0 0\r\n";
       $body.= "m=audio 8000 RTP/AVP 0 8 18 3 4 97 98\r\n";
       $body.= "m=audio 14582 RTP/AVP 0 8 3 101\r\n";
-     // $body.= "a=rtpmap:0 PCMU/8000\r\n";
-     // $body.= "a=rtpmap:18 G729/8000\r\n";
-     // $body.= "a=rtpmap:97 ilbc/8000\r\n";
+      $body.= "a=rtpmap:0 PCMU/8000\r\n";
+      $body.= "a=rtpmap:18 G729/8000\r\n";
+      $body.= "a=rtpmap:97 ilbc/8000\r\n";
       $body.= "a=rtpmap:98 speex/8000\r\n";
       
       $this->body = $body;
@@ -705,7 +705,6 @@ class sip
     if (preg_match('/^Server: (.*)/im', $this->rx_msg, $m))
     {
       $this->server = trim($m[1]);
-      log::add('clientSIP','debug','Server: '.json_encode($m));
     }
     // Response contact
     $this->res_contact = $this->parseContact();
@@ -769,7 +768,6 @@ class sip
     if (preg_match('/^Server: (.*)/im', $this->rx_msg, $m))
     {
       $this->server = trim($m[1]);
-      log::add('clientSIP','debug','Server: '.json_encode($m));
     }
     // Request From
     $m = array();
