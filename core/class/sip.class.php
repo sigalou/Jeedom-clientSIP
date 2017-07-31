@@ -700,6 +700,12 @@ class sip
       $this->to_tag = trim($m[1]);
     }
     
+    // Server Name
+    $m = array(); 
+    if (preg_match('/^Server:/im', $this->rx_msg, $m))
+    {
+      $this->server = trim($m[1]);
+    }
     // Response contact
     $this->res_contact = $this->parseContact();
     
