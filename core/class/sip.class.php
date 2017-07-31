@@ -340,6 +340,7 @@ class sip
       $body.= "c=IN IP4 ".$this->src_ip."\r\n";
       $body.= "t=0 0\r\n";
       $body.= "m=audio 8000 RTP/AVP 0 8 18 3 4 97 98\r\n";
+      $body.= "m=audio 14582 RTP/AVP 0 8 3 101\r\n";
      // $body.= "a=rtpmap:0 PCMU/8000\r\n";
      // $body.= "a=rtpmap:18 G729/8000\r\n";
      // $body.= "a=rtpmap:97 ilbc/8000\r\n";
