@@ -35,7 +35,7 @@ class clientSIP extends eqLogic {
 		foreach(eqLogic::byType('clientSIP') as $clientSIP){
 			 $clientSIP->_sip=null;
 			$clientSIP->checkAndUpdateCmd('RegStatus','Inactif');
-			$clientSIP->checkAndUpdateCmd('CallStatus','Inactif');
+			$clientSIP->checkAndUpdateCmd('CallStatus','Racrocher');
 			$cron = cron::byClassAndFunction('clientSIP', 'ConnectSip', array('id' => $clientSIP->getId()));
 			if (is_object($cron)) 	
 				$cron->remove();
@@ -128,7 +128,7 @@ class clientSIP extends eqLogic {
 				//ajouter les options de compatibilité de jeedom
 				$sip->reply(200,'Ok');
 				event::add('clientSIP::rtp', utils::o2a($this));
-				$this->checkAndUpdateCmd('CallStatus','Communication en cours');
+				$this->checkAndUpdateCmd('CallStatus','Décrocher');
 			break;
 			case 'Racrocher':
 				//$sip->reply(603,'Decline');
@@ -172,7 +172,7 @@ class clientSIPCmd extends cmd {
 				$Port=config::byKey('Port', 'clientSIP');
 				$Username=$this->getEqLogic()->getConfiguration("Username");
 				$Password=$this->getEqLogic()->getConfiguration("Password");
-				$this->getEqLogic()->checkAndUpdateCmd('CallStatus','Inactif');
+				$this->getEqLogic()->checkAndUpdateCmd('CallStatus','Racrocher');
 				$sip = new sip($Host);
 				$sip->setUsername($Username);
 				$sip->setPassword($Password);
@@ -194,7 +194,7 @@ class clientSIPCmd extends cmd {
 					break;
 					default:
 						$sip=null;
-						$this->getEqLogic()->checkAndUpdateCmd('CallStatus','Inactif');
+						$this->getEqLogic()->checkAndUpdateCmd('CallStatus','Racrocher');
 					break;
 				}
 			break;
