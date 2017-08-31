@@ -30,16 +30,34 @@
 					"Racrocher": {
 						className: "btn-danger",
 						callback: function () {
-							jeedom.cmd.execute({id:_params.id, value:'Racrocher'});
+							updateCmd('Racrocher');
 						}
 					},
 					success: {
 						label: "Décrocher",
 						className: "btn-success",
 						callback: function () {
-							jeedom.cmd.execute({id:_params.id, value:'Decrocher'});
+							updateCmd('Decrocher');
 						}
 					},
+				}
+			});
+		}
+		function updateCmd(reponse){
+			$.ajax({
+				type: 'POST',            
+				async: false,
+				url: 'plugins/clientSIP/core/ajax/clientSIP.ajax.php',
+				data:{
+					action: 'updateCache',
+					value:reponse
+				},
+				dataType: 'json',
+				global: false,
+				error: function(request, status, error) {},
+				success: function(data) {
+					if (!data.result)
+						$('#div_alert').showAlert({message: 'Aucun message reçu', level: 'error'});
 				}
 			});
 		}
