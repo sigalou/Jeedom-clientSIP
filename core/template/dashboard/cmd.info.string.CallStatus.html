@@ -30,14 +30,14 @@
 					"Racrocher": {
 						className: "btn-danger",
 						callback: function () {
-							jeedom.cmd.refreshValue({id:_params.id, value:'Racrocher'});
+							jeedom.cmd.execute({id:_params.id, value:'Racrocher'});
 						}
 					},
 					success: {
 						label: "Décrocher",
 						className: "btn-success",
 						callback: function () {
-							jeedom.cmd.refreshValue({id:_params.id, value:'Decrocher'});
+							jeedom.cmd.execute({id:_params.id, value:'Decrocher'});
 						}
 					},
 				}
