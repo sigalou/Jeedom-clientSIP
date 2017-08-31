@@ -72,4 +72,4 @@ if (init('object_id') == '') {
 	}
 }
 echo '</div>';
-include_file('desktop', 'panel', 'js', 'motion');?>
+include_file('desktop', 'panel', 'js', 'clientSIP');?>
