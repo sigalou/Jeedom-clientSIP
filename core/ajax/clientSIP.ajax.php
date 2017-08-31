@@ -10,7 +10,7 @@ try {
    		$cmd=cmd::byId(init('id'));
     		if(is_object($cmd)){
       			$cmd->event(init('value'));
-		  	log::add('clientSIP','debug','Mise a jours du status: '.$value);
+		  	log::add('clientSIP','debug','Mise a jours du status: '.init('value'));
 		  	ajax::success(true);
 		}
 		ajax::success(false);
