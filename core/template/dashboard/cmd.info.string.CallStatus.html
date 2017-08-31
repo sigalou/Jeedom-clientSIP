@@ -12,36 +12,36 @@
 			}
 		}
 		jeedom.cmd.update['#id#']({display_value:"#state#",valueDate:'#valueDate#',collectDate:'#collectDate#',alertLevel:'#alertLevel#'});
-    $('body').on('clientSIP::call', function (_event,_options) {
-	Call('Un appel est en cours, voulez vous répondre');
-});
-$('body').on('clientSIP::rtp', function (_event,_options) {
-	var message=$('<div>')
-		.append($('<video>')
-			.attr('src','')
-			.text('Votre navigateur ne supporte pas la VIDEO ou le RTP stream'));
-		Call(message);
-});
-    function Call(message){
-	bootbox.dialog({
-		title: "{{Appel en cours}}",
-		message: message,
-		buttons: {
-			"Racrocher": {
-				className: "btn-danger",
-				callback: function () {
-jeedom.cmd.refreshValue({id:_params.id, value:'Racrocher'});
+		$('body').on('clientSIP::call', function (_event,_options) {
+			Call('Un appel est en cours, voulez vous répondre');
+		});
+		$('body').on('clientSIP::rtp', function (_event,_options) {
+			var message=$('<div>')
+			.append($('<video>')
+				.attr('src','')
+				.text('Votre navigateur ne supporte pas la VIDEO ou le RTP stream'));
+			Call(message);
+		});
+		function Call(message){
+			bootbox.dialog({
+				title: "{{Appel en cours}}",
+				message: message,
+				buttons: {
+					"Racrocher": {
+						className: "btn-danger",
+						callback: function () {
+							jeedom.cmd.refreshValue({id:_params.id, value:'Racrocher'});
+						}
+					},
+					success: {
+						label: "Décrocher",
+						className: "btn-success",
+						callback: function () {
+							jeedom.cmd.refreshValue({id:_params.id, value:'Decrocher'});
+						}
+					},
 				}
-			},
-			success: {
-				label: "Décrocher",
-				className: "btn-success",
-				callback: function () {
-jeedom.cmd.refreshValue({id:_params.id, value:'Decrocher'});
-				}
-			},
+			});
 		}
-	});
-}
 	</script>
 </div>
