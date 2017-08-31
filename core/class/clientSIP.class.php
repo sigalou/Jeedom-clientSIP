@@ -58,7 +58,7 @@ class clientSIP extends eqLogic {
 	}
 	public function postSave() {
 		$this->AddCommande('Etat connexion','RegStatus','info', 'string');
-		$this->AddCommande('Etat appel','CallStatus','info', 'string');
+		$this->AddCommande('Etat appel','CallStatus','info', 'string','CallStatus');
 		$this->AddCommande('Appel','call','action','message','call');
 		$this->checkAndUpdateCmd('RegStatus','Inactif');
 	}
@@ -122,15 +122,12 @@ class clientSIP extends eqLogic {
 		$sip->reply(180,'Ringing');
 		$this->checkAndUpdateCmd('CallStatus','Sonnerie');
 		event::add('clientSIP::call', utils::o2a($this));
-		cache::set('clientSIP::call::statut', 'Sonnerie', 0);
-		while(true){
-      			$cache = cache::byKey('clientSIP::call::statut');
+		while($this->getCmd(null,'CallStatus')->execCmd() == 'Sonnerie'){
 			switch($cache->getValue(true)){
 				case 'Decrocher':
 					//ajouter les options de compatibilité de jeedom
 					//$sip->reply(200,'Ok');
 					event::add('clientSIP::rtp', utils::o2a($this));
-					cache::set('clientSIP::call::statut', 'Communication', 0);
 					$this->checkAndUpdateCmd('CallStatus','Communication en cours');
 				break;
 				case 'Racrocher':
@@ -155,7 +152,7 @@ class clientSIP extends eqLogic {
 		$Commande->setIsVisible(1);
 		$Commande->setType($Type);
 		$Commande->setSubType($SubType);
-			if($Template !=''){
+		if($Template !=''){
 			$Commande->setTemplate('dashboard',$Template);
 			$Commande->setTemplate('mobile',$Template);
 		}
