@@ -128,7 +128,7 @@ class clientSIP extends eqLogic {
 			switch($cache->getValue(true)){
 				case 'Decrocher':
 					//ajouter les options de compatibilité de jeedom
-					$sip->reply(200,'Ok');
+					//$sip->reply(200,'Ok');
 					event::add('clientSIP::rtp', utils::o2a($this));
 					cache::set('clientSIP::call::statut', 'Communication', 0);
 					$this->checkAndUpdateCmd('CallStatus','Communication en cours');
