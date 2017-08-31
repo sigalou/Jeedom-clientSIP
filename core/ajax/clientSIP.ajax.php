@@ -8,9 +8,9 @@ try {
     	}
 	if (init('action') == 'updateCache') {
 		$value=init('value');
-		log::add('clientSIP','debug','Mise a jours du satus: '.$value);
+		log::add('clientSIP','debug','Mise a jours du status: '.$value);
    		cache::set('clientSIP::call::statut',$value, 0);
-		ajax::success();
+		ajax::success(true);
 	}
    throw new Exception(__('Aucune methode correspondante à : ', __FILE__) . init('action'));
     /*     * *********Catch exeption*************** */
