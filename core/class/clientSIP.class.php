@@ -122,21 +122,20 @@ class clientSIP extends eqLogic {
 		$sip->reply(180,'Ringing');
 		$this->checkAndUpdateCmd('CallStatus','Sonnerie');
 		event::add('clientSIP::call', utils::o2a($this));
-		while($this->getCmd(null,'CallStatus')->execCmd() == 'Sonnerie'){
-			switch($cache->getValue(true)){
-				case 'Decrocher':
-					//ajouter les options de compatibilité de jeedom
-					//$sip->reply(200,'Ok');
-					event::add('clientSIP::rtp', utils::o2a($this));
-					$this->checkAndUpdateCmd('CallStatus','Communication en cours');
-				break;
-				case 'Racrocher':
-					//$sip->reply(603,'Decline');
-					$sip->setMethod('CANCEL');
-					$sip->send();
-					$this->checkAndUpdateCmd('CallStatus','Racrocher');
-				return;
-			}
+		while($this->getCmd(null,'CallStatus')->execCmd() == 'Sonnerie');
+		switch($this->getCmd(null,'CallStatus')->execCmd()){
+			case 'Decrocher':
+				//ajouter les options de compatibilité de jeedom
+				$sip->reply(200,'Ok');
+				event::add('clientSIP::rtp', utils::o2a($this));
+				$this->checkAndUpdateCmd('CallStatus','Communication en cours');
+			break;
+			case 'Racrocher':
+				//$sip->reply(603,'Decline');
+				$sip->setMethod('CANCEL');
+				$sip->send();
+				$this->checkAndUpdateCmd('CallStatus','Racrocher');
+			return;
 		}
 	}
 	public function AddCommande($Name,$_logicalId,$Type="info", $SubType='string',$Template='') {
