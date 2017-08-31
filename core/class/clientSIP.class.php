@@ -137,6 +137,11 @@ class clientSIP extends eqLogic {
 				$this->checkAndUpdateCmd('CallStatus','Racrocher');
 			return;
 		}
+		while($this->getCmd(null,'CallStatus')->execCmd() == 'Racrocher');
+		//$sip->reply(603,'Decline');
+		$sip->setMethod('CANCEL');
+		$sip->send();
+		$this->checkAndUpdateCmd('CallStatus','Racrocher');
 	}
 	public function AddCommande($Name,$_logicalId,$Type="info", $SubType='string',$Template='') {
 		$Commande = $this->getCmd(null,$_logicalId);
