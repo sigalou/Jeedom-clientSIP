@@ -112,8 +112,8 @@ class clientSIP extends eqLogic {
 	private function Register($sip){
 		$Host=config::byKey('Host', 'clientSIP');
 		$Port=config::byKey('Port', 'clientSIP');
-		$Username=$clientSIP->getConfiguration("Username");
-		$Password=$clientSIP->getConfiguration("Password");
+		$Username=$this->getConfiguration("Username");
+		$Password=$this->getConfiguration("Password");
 		$expiration=$this->_lastRegister->add(new DateInterval($this->getConfiguration('Expiration'))); 
 		if($expiration < new DateTime()){
 			$sip->setUsername($Username);
@@ -124,7 +124,7 @@ class clientSIP extends eqLogic {
 			$sip->setUri('sip:'.$Username.'@'.$Host.';transport='.$clientSIP->getConfiguration("transport"));
 			$sip->setServerMode(true);
 			$res = $sip->send();
-			$clientSIP->checkAndUpdateCmd('RegStatus','Enregistrer');
+			$this->checkAndUpdateCmd('RegStatus','Enregistrer');
 			$this->_lastRegister = new DateTime();
 		}
 	}
@@ -160,8 +160,8 @@ class clientSIP extends eqLogic {
 	public function Racrocher($sip) {
 		$Host=config::byKey('Host', 'clientSIP');
 		$Port=config::byKey('Port', 'clientSIP');
-		$Username=$clientSIP->getConfiguration("Username");
-		$Password=$clientSIP->getConfiguration("Password");
+		$Username=$this->getConfiguration("Username");
+		$Password=$this->getConfiguration("Password");
 		//$sip->reply(603,'Decline');
 		$sip->setMethod('CANCEL');
 		$sip->setFrom('sip:'.$Username.'@'.$Host/*.':'.$Port*/);
