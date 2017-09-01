@@ -2,7 +2,7 @@
 require_once dirname(__FILE__) . '/../../../../core/php/core.inc.php';
 include_file('core', 'sip', 'class', 'clientSIP');
 class clientSIP extends eqLogic {
-	private $_lastRegister;
+	private $_lastRegister=mktime();
 	public static function deamon_info() {
 		$return = array();
 		$return['log'] = 'clientSIP';
@@ -114,7 +114,7 @@ class clientSIP extends eqLogic {
 		$Port=config::byKey('Port', 'clientSIP');
 		$Username=$this->getConfiguration("Username");
 		$Password=$this->getConfiguration("Password");
-		$expiration=$this->_lastRegister->add(new DateInterval($this->getConfiguration('Expiration'))); 
+		$expiration=$this->_lastRegister+$this->getConfiguration('Expiration'); 
 		if($expiration < new DateTime()){
 			$sip->setUsername($Username);
 			$sip->setPassword($Password);
@@ -125,7 +125,7 @@ class clientSIP extends eqLogic {
 			$sip->setServerMode(true);
 			$res = $sip->send();
 			$this->checkAndUpdateCmd('RegStatus','Enregistrer');
-			$this->_lastRegister = new DateTime();
+			$this->_lastRegister = mktime();
 		}
 	}
 	public function RepondreAppel($sip) {
