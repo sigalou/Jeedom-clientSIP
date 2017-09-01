@@ -125,7 +125,7 @@ class clientSIP extends eqLogic {
 		while($this->getCmd(null,'CallStatus')->execCmd() == 'Sonnerie');
 		switch($this->getCmd(null,'CallStatus')->execCmd()){
 			case 'Decrocher':
-				$this->Racrocher($sip);
+				$this->Decrocher($sip);
 			break;
 			case 'Racrocher':;
 				$this->Racrocher($sip);
@@ -137,7 +137,7 @@ class clientSIP extends eqLogic {
 	public function Decrocher($sip) {
 		//ajouter les options de compatibilité de jeedom
 		$sip->reply(200,'Ok');
-		event::add('clientSIP::rtp', utils::o2a($this));
+		event::add('clientSIP::rtsp', utils::o2a($sip->rtsp));
 		$this->checkAndUpdateCmd('CallStatus','Décrocher');
 	}
 	public function Racrocher($sip) {
