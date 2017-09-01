@@ -131,7 +131,7 @@ class clientSIP extends eqLogic {
 				$this->Racrocher($sip);
 			return;
 		}
-		while($this->getCmd(null,'CallStatus')->execCmd() == 'Racrocher');
+		while($this->getCmd(null,'CallStatus')->execCmd() == 'Decrocher');
 		$this->Racrocher($sip);
 	}
 	public function Decrocher($sip) {
