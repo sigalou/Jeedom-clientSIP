@@ -121,7 +121,7 @@ class clientSIP extends eqLogic {
 			$sip->setMethod('REGISTER');
 			//$sip->setProxy($Host.':'.$Port);
 			$sip->setFrom('sip:'.$Username.'@'.$Host/*.':'.$Port*/);
-			$sip->setUri('sip:'.$Username.'@'.$Host.';transport='.$clientSIP->getConfiguration("transport"));
+			$sip->setUri('sip:'.$Username.'@'.$Host.';transport='.$this->getConfiguration("transport"));
 			$sip->setServerMode(true);
 			$res = $sip->send();
 			$this->checkAndUpdateCmd('RegStatus','Enregistrer');
