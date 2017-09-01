@@ -2,7 +2,7 @@
 require_once dirname(__FILE__) . '/../../../../core/php/core.inc.php';
 include_file('core', 'sip', 'class', 'clientSIP');
 class clientSIP extends eqLogic {
-	private $_lastRegister=mktime();
+	private $_lastRegister;
 	public static function deamon_info() {
 		$return = array();
 		$return['log'] = 'clientSIP';
