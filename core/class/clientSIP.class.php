@@ -137,7 +137,7 @@ class clientSIP extends eqLogic {
 	public function Decrocher($sip) {
 		//ajouter les options de compatibilité de jeedom
 		$sip->reply(200,'Ok');
-		event::add('clientSIP::rtsp', utils::o2a($sip->rtsp));
+		event::add('clientSIP::rtsp', $sip->rtsp());
 		$this->checkAndUpdateCmd('CallStatus','Décrocher');
 	}
 	public function Racrocher($sip) {
