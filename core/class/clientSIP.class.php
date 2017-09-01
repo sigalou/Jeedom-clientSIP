@@ -115,7 +115,7 @@ class clientSIP extends eqLogic {
 		$Username=$this->getConfiguration("Username");
 		$Password=$this->getConfiguration("Password");
 		$expiration=$this->_lastRegister+$this->getConfiguration('Expiration'); 
-		if($expiration < new DateTime()){
+		//if($expiration < new DateTime()){
 			$sip->setUsername($Username);
 			$sip->setPassword($Password);
 			$sip->setMethod('REGISTER');
@@ -126,7 +126,7 @@ class clientSIP extends eqLogic {
 			$res = $sip->send();
 			$this->checkAndUpdateCmd('RegStatus','Enregistrer');
 			$this->_lastRegister = mktime();
-		}
+		//}
 	}
 	public function RepondreAppel($sip) {
 		//$sip->reply(100,'Trying');
