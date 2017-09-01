@@ -132,9 +132,15 @@ class clientSIP extends eqLogic {
 		$this->checkAndUpdateCmd('CallStatus','Sonnerie');
 		event::add('clientSIP::call', utils::o2a($this));
 		while($this->getCmd(null,'CallStatus')->execCmd() == 'Sonnerie');
+		$call['start']= date('d-m-Y H:i:s');
+		$call['status']= 'ringing';
+		$call['status']= 'incoming';
+		self::addCacheMonitor($call);
 		switch($this->getCmd(null,'CallStatus')->execCmd()){
 			case 'Decrocher':
 				$this->Decrocher($sip);
+				$call['status']= 'open';
+				self::addCacheMonitor($call);
 			break;
 			case 'Racrocher':;
 				$this->Racrocher($sip);
@@ -155,6 +161,15 @@ class clientSIP extends eqLogic {
 		$sip->setFrom('sip:'.$Username.'@'.$Host/*.':'.$Port*/);
 		$sip->send();
 		$this->checkAndUpdateCmd('CallStatus','Racrocher');
+	}
+	public static function addHistoryCall($_call) {
+		$cache = cache::byKey('clientSIP::HistoryCall');
+		$value = json_decode($cache->getValue('[]'), true);
+		if($key=array_search($value,$_call['start'])===false)
+			$value[$key]=$_call;
+		else
+			$value[] = $_call;
+		cache::set('clientSIP::HistoryCall', json_encode(array_slice($value, -250, 250)), 0);
 	}
 	public function AddCommande($Name,$_logicalId,$Type="info", $SubType='string',$Template='') {
 		$Commande = $this->getCmd(null,$_logicalId);
