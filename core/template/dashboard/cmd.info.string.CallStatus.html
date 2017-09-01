@@ -15,11 +15,15 @@
 		$('body').on('clientSIP::call', function (_event,_options) {
 			Call('Un appel est en cours, voulez vous répondre');
 		});
-		$('body').on('clientSIP::rtp', function (_event,_options) {
+		$('body').on('clientSIP::rtsp', function (_event,_options) {
 			var message=$('<div>')
-			.append($('<video>')
-				.attr('src','')
-				.text('Votre navigateur ne supporte pas la VIDEO ou le RTP stream'));
+			.append($('<div id="cctv-container">')
+				.append($('<object classid="clsid:9BE31822-FDAD-461B-AD51-BE1D1C159921" codebase="http://downloads.videolan.org/pub/videolan/vlc/latest/win32/axvlc.cab" id="vlc" events="True" width="640" height="480">')
+					.append($('<param name="Src" value="'+_options.rtsp+'"/>'))
+					.append($('<param name="ShowDisplay" value="True"/>'))
+					.append($('<param name="AutoLoop" value="False"/>'))
+					.append($('<param name="AutoPlay" value="True"/>'))
+					.append($('<embed id="vlcEmb" type="application/x-google-vlc-plugin" version="VideoLAN.VLCPlugin.2" autoplay="yes" loop="no" target="'+_options.rtsp+'" width="640" height="480"/>'))));
 			Call(message);
 		});
 		function Call(message){
