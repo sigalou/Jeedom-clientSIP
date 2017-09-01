@@ -2,6 +2,7 @@
 require_once dirname(__FILE__) . '/../../../../core/php/core.inc.php';
 include_file('core', 'sip', 'class', 'clientSIP');
 class clientSIP extends eqLogic {
+	private $_lastRegister;
 	public static function deamon_info() {
 		$return = array();
 		$return['log'] = 'clientSIP';
@@ -96,16 +97,9 @@ class clientSIP extends eqLogic {
 			try {			
 				$clientSIP->checkAndUpdateCmd('RegStatus','En cours');
 				$sip = new sip($Host);
-				$sip->setUsername($Username);
-				$sip->setPassword($Password);
-				$sip->setMethod('REGISTER');
-				//$sip->setProxy($Host.':'.$Port);
-				$sip->setFrom('sip:'.$Username.'@'.$Host/*.':'.$Port*/);
-				$sip->setUri('sip:'.$Username.'@'.$Host.';transport='.$clientSIP->getConfiguration("transport"));
-				$sip->setServerMode(true);
-				$res = $sip->send();
-				$clientSIP->checkAndUpdateCmd('RegStatus','Enregistrer');
+				
 				while(true){
+					$clientSIP->Register($sip);
 					//$sip->listen('NOTIFY');
 					$sip->newCall();
 					$sip->listen('INVITE');
@@ -115,6 +109,21 @@ class clientSIP extends eqLogic {
 				die("Caught exception ".$e->getMessage."\n");
 			}
 			
+		}
+	}
+	private function Register($sip){
+		$expiration=$this->_lastRegister->add(new DateInterval($this->getConfiguration('Expiration'))); 
+		if($expiration < new DateTime()){
+			$sip->setUsername($Username);
+			$sip->setPassword($Password);
+			$sip->setMethod('REGISTER');
+			//$sip->setProxy($Host.':'.$Port);
+			$sip->setFrom('sip:'.$Username.'@'.$Host/*.':'.$Port*/);
+			$sip->setUri('sip:'.$Username.'@'.$Host.';transport='.$clientSIP->getConfiguration("transport"));
+			$sip->setServerMode(true);
+			$res = $sip->send();
+			$clientSIP->checkAndUpdateCmd('RegStatus','Enregistrer');
+			$this->_lastRegister = new DateTime();
 		}
 	}
 	public function RepondreAppel($sip) {
