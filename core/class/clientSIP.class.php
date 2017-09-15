@@ -76,7 +76,6 @@ class clientSIP extends eqLogic {
 			$cron->setFunction('Register');
 			$cron->setOption(array('id' => $this->getId()));
 			$cron->setEnable(1);
-			$cron->setDeamon(1);
 			$minute=round($this->getConfiguration('Expiration')/60,0);
 			$second=$this->getConfiguration('Expiration')-$minute*60;
 			if($minute>60){
@@ -90,6 +89,8 @@ class clientSIP extends eqLogic {
 			$cron->save();
 		}
 		$cron->save();
+		$cron->start();
+		$cron->run();
 		$cron =cron::byClassAndFunction('clientSIP', 'ConnectSip', array('id' => $this->getId()));
 		if (!is_object($cron)) {
 			$cron = new cron();
