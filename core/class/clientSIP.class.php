@@ -10,6 +10,9 @@ class clientSIP extends eqLogic {
 		$return['state'] = 'nok';
 		foreach(eqLogic::byType('clientSIP') as $clientSIP){
 			if($clientSIP->getIsEnable()){
+				$cron = cron::byClassAndFunction('clientSIP', 'Register', array('id' => $clientSIP->getId()));
+				if (!is_object($cron)) 	
+					return $return;
 				$cron = cron::byClassAndFunction('clientSIP', 'ConnectSip', array('id' => $clientSIP->getId()));
 				if (!is_object($cron)) 	
 					return $return;
@@ -37,6 +40,9 @@ class clientSIP extends eqLogic {
 			 $clientSIP->_sip=null;
 			$clientSIP->checkAndUpdateCmd('RegStatus','Inactif');
 			$clientSIP->checkAndUpdateCmd('CallStatus','Racrocher');
+			$cron = cron::byClassAndFunction('clientSIP', 'Register', array('id' => $clientSIP->getId()));
+			if (is_object($cron)) 	
+				$cron->remove()
 			$cron = cron::byClassAndFunction('clientSIP', 'ConnectSip', array('id' => $clientSIP->getId()));
 			if (is_object($cron)) 	
 				$cron->remove();
