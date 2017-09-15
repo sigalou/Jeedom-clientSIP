@@ -42,7 +42,7 @@ class clientSIP extends eqLogic {
 			$clientSIP->checkAndUpdateCmd('CallStatus','Racrocher');
 			$cron = cron::byClassAndFunction('clientSIP', 'Register', array('id' => $clientSIP->getId()));
 			if (is_object($cron)) 	
-				$cron->remove()
+				$cron->remove();
 			$cron = cron::byClassAndFunction('clientSIP', 'ConnectSip', array('id' => $clientSIP->getId()));
 			if (is_object($cron)) 	
 				$cron->remove();
