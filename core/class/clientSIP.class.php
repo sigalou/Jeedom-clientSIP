@@ -143,6 +143,7 @@ class clientSIP extends eqLogic {
 			$Username=$clientSIP->getConfiguration("Username");
 			$Password=$clientSIP->getConfiguration("Password");
 			
+			$clientSIP->checkAndUpdateCmd('RegStatus','Inactif');
 			if(!is_object($clientSIP->_sip))
 				$clientSIP->_sip= new sip($Host); 
 			$clientSIP->_sip->setUsername($Username);
