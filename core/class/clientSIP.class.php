@@ -91,12 +91,8 @@ class clientSIP extends eqLogic {
 			else
 				$heure='*';
 			$cron->setSchedule($minute.' '.$heure.' * * *');
-			$cron->setTimeout($this->getConfiguration('Expiration'));
 			$cron->save();
 		}
-		$cron->save();
-		$cron->start();
-		$cron->run();
 		$cron =cron::byClassAndFunction('clientSIP', 'ConnectSip', array('id' => $this->getId()));
 		if (!is_object($cron)) {
 			$cron = new cron();
@@ -106,13 +102,11 @@ class clientSIP extends eqLogic {
 			$cron->setEnable(1);
 			$cron->setDeamon(1);
 			$cron->setSchedule('* * * * *');
-			$cron->setTimeout($this->getConfiguration('Expiration'));
+			$cron->setTimeout($minute);
 			$cron->save();
 		}
-		$cron->save();
 		$cron->start();
 		$cron->run();
-		return $cron;
 	}
 	public static function ConnectSip($_option){
 		log::add('clientSIP', 'debug', 'Objet mis à jour => ' . json_encode($_option));
