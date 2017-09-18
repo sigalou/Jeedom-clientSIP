@@ -90,7 +90,7 @@ class clientSIP extends eqLogic {
 			}
 			else
 				$heure='*';
-			$cron->setSchedule($second.' '.$minute.' '.$heure.' * *');
+			$cron->setSchedule($minute.' '.$heure.' * * *');
 			$cron->setTimeout($this->getConfiguration('Expiration'));
 			$cron->save();
 		}
