@@ -4,7 +4,6 @@
 	"licence" : "AGPL",
 	"author" : "Halbout Michael",
 	"require" : "3.0",
-	//"display" : "panel",
 	"category" : "communication",
 	"hasOwnDeamon" : true
 }
