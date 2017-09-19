@@ -85,12 +85,12 @@ class clientSIP extends eqLogic {
 			$minute=round($this->getConfiguration('Expiration')/60,0);
 			$second=$this->getConfiguration('Expiration')-$minute*60;
 			if($minute>60){
-				$heure=round($minute/60,0);
+				$heure='*/'.round($minute/60,0);
 				$minute=$minute-$heure*60;
 			}
 			else
 				$heure='*';
-			$cron->setSchedule($minute.' '.$heure.' * * *');
+			$cron->setSchedule('*/'.$minute.' '.$heure.' * * *');
 			$cron->save();
 		}
 		$cron =cron::byClassAndFunction('clientSIP', 'ConnectSip', array('id' => $this->getId()));
