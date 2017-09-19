@@ -94,16 +94,6 @@ $eqLogics = eqLogic::byType('clientSIP');
 									<input type="text" class="eqLogicAttr form-control" data-l1key="name" placeholder="{{Nom de l'équipement}}"/>
 								</div>
 							</div>
-							<div class="form-group expertModeVisible">
-								<label class="col-md-2 control-label ">{{Adresse }}
-									<sup>
-										<i class="fa fa-question-circle tooltips" title="Indiquez l'adresse de votre équipement. " style="font-size : 1em;color:grey;"></i>
-									</sup>
-								</label>
-								<div class="col-md-3">
-									<input type="text" class="eqLogicAttr form-control" data-l1key="logicalId"/>
-								</div>
-							</div>
 							<div class="form-group">
 								<label class="col-md-2 control-label" >
 									{{Objet parent}}
