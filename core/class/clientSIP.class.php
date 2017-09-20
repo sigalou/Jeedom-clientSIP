@@ -114,9 +114,9 @@ class clientSIP extends eqLogic {
 		if (is_object($clientSIP) && $clientSIP->getIsEnable()) {
 			$Host=config::byKey('Host', 'clientSIP');
 			$Port=config::byKey('Port', 'clientSIP');
-			try {			
-				$clientSIP->checkAndUpdateCmd('RegStatus','Enregistrer');
-				while($clientSIP->getCmd(null,'RegStatus')->execCmd() == 'Decrocher');
+			try {	
+				while(!is_object($clientSIP->_sip));
+				while($clientSIP->getCmd(null,'RegStatus')->execCmd() == 'Enregistrer');
 				while(true){
 					$clientSIP->_sip->newCall();
 					$clientSIP->_sip->listen('INVITE');
@@ -136,7 +136,7 @@ class clientSIP extends eqLogic {
 			$Port=config::byKey('Port', 'clientSIP');
 			$Username=$clientSIP->getConfiguration("Username");
 			$Password=$clientSIP->getConfiguration("Password");
-			
+	
 			$clientSIP->checkAndUpdateCmd('RegStatus','Inactif');
 			if(!is_object($clientSIP->_sip))
 				$clientSIP->_sip= new sip($Host); 
@@ -152,8 +152,8 @@ class clientSIP extends eqLogic {
 		}
 	}
 	public function RepondreAppel() {
-		//$clientSIP->_sip->reply(100,'Trying');
-		$clientSIP->_sip->reply(180,'Ringing');
+		//$this->_sip->reply(100,'Trying');
+		$this->_sip->reply(180,'Ringing');
 		$this->checkAndUpdateCmd('CallStatus','Sonnerie');
 		event::add('clientSIP::call', utils::o2a($this));
 		while($this->getCmd(null,'CallStatus')->execCmd() == 'Sonnerie');
@@ -176,8 +176,8 @@ class clientSIP extends eqLogic {
 	}
 	public function Decrocher() {
 		//ajouter les options de compatibilité de jeedom
-		$clientSIP->_sip->reply(200,'Ok');
-		event::add('clientSIP::rtsp', $clientSIP->_sip->rtsp());
+		$this->_sip->reply(200,'Ok');
+		event::add('clientSIP::rtsp', $this->_sip->rtsp());
 		$this->checkAndUpdateCmd('CallStatus','Décrocher');
 	}
 	public function Racrocher() {
@@ -186,10 +186,36 @@ class clientSIP extends eqLogic {
 		$Username=$this->getConfiguration("Username");
 		$Password=$this->getConfiguration("Password");
 		//$sip->reply(603,'Decline');
-		$clientSIP->_sip->setMethod('CANCEL');
-		$clientSIP->_sip->setFrom('sip:'.$Username.'@'.$Host/*.':'.$Port*/);
-		$clientSIP->_sip->send();
+		$this->_sip->setMethod('CANCEL');
+		$this->_sip->setFrom('sip:'.$Username.'@'.$Host/*.':'.$Port*/);
+		$this->_sip->send();
 		$this->checkAndUpdateCmd('CallStatus','Racrocher');
+	}
+	public function call($number) {
+		$Host=config::byKey('Host', 'clientSIP');
+		$Port=config::byKey('Port', 'clientSIP');
+		$Username=$this->getConfiguration("Username");
+		$Password=$this->getConfiguration("Password");
+		$this->checkAndUpdateCmd('CallStatus','Racrocher');
+		while(!is_object($this->_sip));
+		$this->_sip->newCall();
+		$this->_sip->setFrom('sip:'.$Username.'@'.$Host);
+		$this->_sip->setUri('sip:'.$Username.'@'.$Host.';transport='.$this->getConfiguration("transport"));
+		$this->_sip->setTo('sip:'.$number.'@'.$Host);
+		$this->_sip->setMethod('INVITE');
+		$this->checkAndUpdateCmd('CallStatus','Appel en cours');
+		$res=$this->_sip->send();
+		switch($res){
+			case '200':
+				$this->checkAndUpdateCmd('CallStatus','Décroché');
+			break;
+			case '318':
+				$this->checkAndUpdateCmd('CallStatus','Sonnerie');
+			break;
+			default:
+				$this->checkAndUpdateCmd('CallStatus','Racrocher');
+			break;
+		}
 	}
 	public static function addHistoryCall($_call) {
 		$cache = cache::byKey('clientSIP::HistoryCall');
@@ -225,35 +251,7 @@ class clientSIPCmd extends cmd {
 	public function execute($_options = null){
 		switch($this->getLogicalId()){
 			case 'call':				
-				$Host=config::byKey('Host', 'clientSIP');
-				$Port=config::byKey('Port', 'clientSIP');
-				$Username=$this->getEqLogic()->getConfiguration("Username");
-				$Password=$this->getEqLogic()->getConfiguration("Password");
-				$this->getEqLogic()->checkAndUpdateCmd('CallStatus','Racrocher');
-				$sip = new sip($Host);
-				$sip->setUsername($Username);
-				$sip->setPassword($Password);
-				//$sip->setProxy($Host.':'.$Port);
-				//$sip->setMethod('REGISTER');
-				$sip->setFrom('sip:'.$Username.'@'.$Host);
-				$sip->setUri('sip:'.$Username.'@'.$Host.';transport='.$this->getEqLogic()->getConfiguration("transport"));
-				//$res = $sip->send();
-				$sip->setTo('sip:'.$_options['message'].'@'.$Host);
-				$sip->setMethod('INVITE');
-				$this->getEqLogic()->checkAndUpdateCmd('CallStatus','Appel en cours');
-				$res=$sip->send();
-				switch($res){
-					case '200':
-						$this->getEqLogic()->checkAndUpdateCmd('CallStatus','Décroché');
-					break;
-					case '318':
-						$this->getEqLogic()->checkAndUpdateCmd('CallStatus','Sonnerie');
-					break;
-					default:
-						$sip=null;
-						$this->getEqLogic()->checkAndUpdateCmd('CallStatus','Racrocher');
-					break;
-				}
+				$this->getEqLogic()->call($_options['message']);
 			break;
 		}
 	}
