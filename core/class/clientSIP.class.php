@@ -116,11 +116,11 @@ class clientSIP extends eqLogic {
 			$Port=config::byKey('Port', 'clientSIP');
 			try {			
 				$clientSIP->checkAndUpdateCmd('RegStatus','Enregistrer');
-				while($this->getCmd(null,'RegStatus')->execCmd() == 'Decrocher');
+				while($clientSIP->getCmd(null,'RegStatus')->execCmd() == 'Decrocher');
 				while(true){
-					$sip->newCall();
-					$sip->listen('INVITE');
-					$clientSIP->RepondreAppel($sip);
+					$clientSIP->_sip->newCall();
+					$clientSIP->_sip->listen('INVITE');
+					$clientSIP->RepondreAppel();
 				}
 			} catch (Exception $e) {
 				die("Caught exception ".$e->getMessage."\n");
@@ -151,9 +151,9 @@ class clientSIP extends eqLogic {
 			$clientSIP->checkAndUpdateCmd('RegStatus','Enregistrer');			
 		}
 	}
-	public function RepondreAppel($sip) {
-		//$sip->reply(100,'Trying');
-		$sip->reply(180,'Ringing');
+	public function RepondreAppel() {
+		//$clientSIP->_sip->reply(100,'Trying');
+		$clientSIP->_sip->reply(180,'Ringing');
 		$this->checkAndUpdateCmd('CallStatus','Sonnerie');
 		event::add('clientSIP::call', utils::o2a($this));
 		while($this->getCmd(null,'CallStatus')->execCmd() == 'Sonnerie');
@@ -168,27 +168,27 @@ class clientSIP extends eqLogic {
 				self::addCacheMonitor($call);
 			break;
 			case 'Racrocher':;
-				$this->Racrocher($sip);
+				$this->Racrocher();
 			return;
 		}
 		while($this->getCmd(null,'CallStatus')->execCmd() == 'Decrocher');
-		$this->Racrocher($sip);
+		$this->Racrocher();
 	}
-	public function Decrocher($sip) {
+	public function Decrocher() {
 		//ajouter les options de compatibilité de jeedom
-		$sip->reply(200,'Ok');
-		event::add('clientSIP::rtsp', $sip->rtsp());
+		$clientSIP->_sip->reply(200,'Ok');
+		event::add('clientSIP::rtsp', $clientSIP->_sip->rtsp());
 		$this->checkAndUpdateCmd('CallStatus','Décrocher');
 	}
-	public function Racrocher($sip) {
+	public function Racrocher() {
 		$Host=config::byKey('Host', 'clientSIP');
 		$Port=config::byKey('Port', 'clientSIP');
 		$Username=$this->getConfiguration("Username");
 		$Password=$this->getConfiguration("Password");
 		//$sip->reply(603,'Decline');
-		$sip->setMethod('CANCEL');
-		$sip->setFrom('sip:'.$Username.'@'.$Host/*.':'.$Port*/);
-		$sip->send();
+		$clientSIP->_sip->setMethod('CANCEL');
+		$clientSIP->_sip->setFrom('sip:'.$Username.'@'.$Host/*.':'.$Port*/);
+		$clientSIP->_sip->send();
 		$this->checkAndUpdateCmd('CallStatus','Racrocher');
 	}
 	public static function addHistoryCall($_call) {
