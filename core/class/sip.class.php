@@ -1,206 +1,44 @@
 <?php
-/**
- * (c) 2007-2016 Chris Maciejewski
- * 
- * Permission is hereby granted, free of charge, to any person obtaining 
- * a copy of this software and associated documentation files 
- * (the "Software"), to deal in the Software without restriction, 
- * including without limitation the rights to use, copy, modify, merge,
- * publish, distribute, sublicense, and/or sell copies of the Software, 
- * and to permit persons to whom the Software is furnished to do so, 
- * subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included 
- * in all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS 
- * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
- * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
- * DEALINGS IN THE SOFTWARE.
- * 
- */
-
-/**
- * PHP SIP UAC class
- * 
- * @ingroup  API
- * @author Chris Maciejewski <chris@level7systems.co.uk>
- * 
- */
-require_once 'PhpSIP.Exception.php';
-
-class PhpSIP
+class sip
 {
-  private $debug = false;
-  
-  /**
-   * Min port
-   */
   private $min_port = 5065;
-  
-  /**
-   * Max port
-   */
   private $max_port = 5265;
-  
-  /**
-   * Final Response timer (in ms)
-   */
   private $fr_timer = 10000;
-  
-  /**
-   * Lock file
-   */
-  private $lock_file = '/dev/shm/cache/PhpSIP.lock';
-  
-  /**
-   * Persistent Lock file 
-   */
+  private $lock_file = '/var/www/html/tmp/PhpSIP.lock';
   private $persistent_lock_file = true;
-  
-  /**
-   * Allowed methods array
-   */
   private $allowed_methods = array(
     "CANCEL","NOTIFY", "INVITE","BYE","REFER","OPTIONS","SUBSCRIBE","MESSAGE", "PUBLISH", "REGISTER"
   );
-  
+  private $server;
   private $server_mode = false;
-  
-  /**
-   * Dialog established
-   */
   private $dialog = false;
-  
-  /**
-   * The opened socket we listen for incoming SIP messages
-   */
   private $socket;
-  
-  /**
-   * Source IP address
-   */
   private $src_ip;
-  
-  /**
-   * Source IP address
-   */
-  private $user_agent = 'PHP SIP';
-  
-  /**
-   * CSeq
-   */
+  private $user_agent = 'Jeedom';
   private $cseq = 20;
-  
-  /**
-   * Source port
-   */
   private $src_port;
-  
-  /**
-   * Call ID
-   */
   private $call_id;
-  
-  /**
-   * Contact
-   */
   private $contact;
-  
-  /**
-   * Request URI
-   */
   private $uri;
-  
-  /**
-   * Request host
-   */
   private $host;
-  
-  /**
-   * Request port
-   */
   private $port = 5060;
-  
-  /**
-   * Outboud SIP proxy
-   */
   private $proxy;
-  
-  /**
-   * Method
-   */
   private $method;
-  
-  /**
-   * Auth username
-   */
   private $username;
-  
-  /**
-   * Auth password
-   */
   private $password;
-  
-  /**
-   * To
-   */
   private $to;
-  
-  /**
-   * To tag
-   */
   private $to_tag;
-  
-  /**
-   * From
-   */
   private $from;
-  
-  /**
-   * From User
-   */
   private $from_user;
-
-  /**
-   * From tag
-   */
   private $from_tag;
-  
-  /**
-   * Via tag
-   */
   private $via;
-  
-  /**
-   * Content type
-   */
   private $content_type;
-  
-  /**
-   * Body
-   */
   private $body;
-  
-  /**
-   * Received SIP message
-   */
   private $rx_msg;
-  
-  /**
-   * Received Response
-   */
   private $res_code;
   private $res_contact;
   private $res_cseq_method;
   private $res_cseq_number;
-
-  /**
-   * Received Request
-   */
   private $req_method;
   private $req_cseq_method;
   private $req_cseq_number;
@@ -209,49 +47,25 @@ class PhpSIP
   private $req_from_tag;
   private $req_to;
   private $req_to_tag;
-  
-  /**
-   * Authentication
-   */
+  private $rtsp;
   private $auth;
-  
-  /**
-   * Routes
-   */
   private $routes = array();
-  
-  /**
-   * Record-route
-   */
   private $record_route = array();
-  
-  /**
-   * Request vias
-   */
   private $request_via = array();
-  
-  /**
-   * Additional headers
-   */
   private $extra_headers = array();
-  
-  /**
-   * Constructor
-   * 
-   * @param $src_ip Ip address to bind (optional)
-   */
   public function __construct($src_ip = null, $src_port = null, $fr_timer = null)
   {
     if (!function_exists('socket_create'))
     {
-      throw new PhpSIPException("socket_create() function missing.");
+      log::add('clientSIP','error',"socket_create() function missing.");
+      die();
     }
-    
     if ($src_ip)
     {
       if (!preg_match('/^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$/', $src_ip))
       {
-        throw new PhpSIPException("Invalid src_ip $src_ip");
+        log::add('clientSIP','error',"Invalid src_ip $src_ip");
+      die();
       }
     }
     else
@@ -268,7 +82,8 @@ class PhpSIP
         
         if (!is_array($addr) || !isset($addr[0]) || substr($addr[0],0,3) == '127')
         {
-          throw new PhpSIPException("Failed to obtain IP address to bind. Please set bind address manualy.");
+          log::add('clientSIP','error',"Failed to obtain IP address to bind. Please set bind address manualy.");
+      die();
         }
       
         $src_ip = $addr[0];
@@ -281,7 +96,8 @@ class PhpSIP
     {
       if (!preg_match('/^[0-9]+$/',$src_port))
       {
-        throw new PhpSIPException("Invalid src_port $src_port");
+        log::add('clientSIP','error',"Invalid src_port $src_port");
+      die();
       }
       
       $this->src_port = $src_port;
@@ -292,7 +108,8 @@ class PhpSIP
     {
       if (!preg_match('/^[0-9]+$/',$fr_timer))
       {
-        throw new PhpSIPException("Invalid fr_timer $fr_timer");
+        log::add('clientSIP','error',"Invalid fr_timer $fr_timer");
+      die();
       }
       
       $this->fr_timer = $fr_timer;
@@ -300,38 +117,14 @@ class PhpSIP
     
     $this->createSocket();
   }
-  
-  /**
-   * Destructor
-   */
   public function __destruct()
   {
     $this->closeSocket();
   }
-  
-  /**
-   * Sets debuggin ON/OFF
-   * 
-   * @param bool $status
-   */
-  public function setDebug($status = false)
-  {
-    $this->debug = $status;
-  }
-  
-  /**
-   * Gets src IP
-   * 
-   * @return string
-   */
   public function getSrcIp()
   {
     return $this->src_ip;
   }
-  
-  /**
-   * Gets port number to bind
-   */
   private function getPort()
   {
     if ($this->src_port)
@@ -341,24 +134,26 @@ class PhpSIP
     
     if ($this->min_port > $this->max_port)
     {
-      throw new PhpSIPException ("Min port is bigger than max port.");
+      log::add('clientSIP','error',"Min port is bigger than max port.");
+      die();
     }
     
     $fp = @fopen($this->lock_file, 'a+');
     
     if (!$fp)
     {
-      throw new PhpSIPException ("Failed to open lock file ".$this->lock_file);
+     log::add('clientSIP','error',"Failed to open lock file ".$this->lock_file);
+      die();
     }
     
     $canWrite = flock($fp, LOCK_EX);
     
     if (!$canWrite)
     {
-      throw new PhpSIPException ("Failed to lock a file in 1000 ms.");
+      log::add('clientSIP','error',"Failed to lock a file in 1000 ms.");
+      die();
     }
-    
-    //file was locked
+
     clearstatcache();
     $size = filesize($this->lock_file);
     
@@ -381,7 +176,8 @@ class PhpSIP
     {
       if (!fwrite($fp, $this->min_port))
       {
-        throw new PhpSIPException("Fail to write data to a lock file.");
+        log::add('clientSIP','error',"Fail to write data to a lock file.");
+      die();
       }
       
       $this->src_port =  $this->min_port;
@@ -402,14 +198,16 @@ class PhpSIP
       
       if (!$src_port)
       {
-        throw new PhpSIPException("No more ports left to bind.");
+        log::add('clientSIP','error',"No more ports left to bind.");
+      die();
       }
       
       $ports[] = $src_port;
       
       if (!fwrite($fp, implode(",",$ports)))
       {
-        throw new PhpSIPException("Failed to write data to lock file.");
+        log::add('clientSIP','error',"Failed to write data to lock file.");
+      die();
       }
       
       $this->src_port = $src_port;
@@ -417,14 +215,11 @@ class PhpSIP
     
     if (!fclose($fp))
     {
-      throw new PhpSIPException("Failed to close lock_file");
+      log::add('clientSIP','error',"Failed to close lock_file");
+      die();
     }
     
   }
-  
-  /**
-   * Releases port
-   */
   private function releasePort()
   {
     if ($this->lock_file === null)
@@ -436,14 +231,16 @@ class PhpSIP
     
     if (!$fp)
     {
-      throw new PhpSIPException("Can't open lock file.");
+      log::add('clientSIP','error',"Can't open lock file.");
+      die();
     }
     
     $canWrite = flock($fp, LOCK_EX);
     
     if (!$canWrite)
     {
-      throw new PhpSIPException("Failed to lock a file in 1000 ms.");
+      log::add('clientSIP','error',"Failed to lock a file in 1000 ms.");
+      die();
     }
     
     clearstatcache();
@@ -462,12 +259,14 @@ class PhpSIP
     {
       if (!fclose($fp))
       {
-        throw new PhpSIPException("Failed to close lock_file");
+        log::add('clientSIP','error',"Failed to close lock_file");
+      die();
       }
       
       if (!unlink($this->lock_file))
       {
-        throw new PhpSIPException("Failed to delete lock_file.");
+        log::add('clientSIP','error',"Failed to delete lock_file.");
+      die();
       }
     }
     else
@@ -477,33 +276,23 @@ class PhpSIP
       
       if ($ports && !fwrite($fp, implode(",",$ports)))
       {
-        throw new PhpSIPException("Failed to save data in lock_file");
+        log::add('clientSIP','error',"Failed to save data in lock_file");
+      die();
       }
       
       flock($fp, LOCK_UN);
       
       if (!fclose($fp))
       {
-        throw new PhpSIPException("Failed to close lock_file");
+        log::add('clientSIP','error',"Failed to close lock_file");
+      die();
       }
     }
   }
-  
-  /**
-   * Adds aditional header
-   * 
-   * @param string $header
-   */
   public function addHeader($header)
   {
     $this->extra_headers[] = $header;
   }
-  
-  /**
-   * Sets From header
-   * 
-   * @param string $from
-   */
   public function setFrom($from)
   {
     if (preg_match('/<.*>$/',$from))
@@ -518,17 +307,12 @@ class PhpSIP
     $m = array();
     if (!preg_match('/sip:(.*)@/i',$this->from,$m))
     {
-      throw new PhpSIPException('Failed to parse From username.');
+      log::add('clientSIP','error','Failed to parse From username.');
+      die();
     }
     
     $this->from_user = $m[1];
   }
-  
-  /**
-   * Sets To header
-   * 
-   * @param string $to
-   */
   public function setTo($to)
   {
     if (preg_match('/<.*>$/',$to))
@@ -540,17 +324,12 @@ class PhpSIP
       $this->to = '<'.$to.'>';
     }
   }
-  
-  /**
-   * Sets method
-   * 
-   * @param string $method
-   */
   public function setMethod($method)
   {
     if (!in_array($method,$this->allowed_methods))
     {
-      throw new PhpSIPException('Invalid method.');
+      log::add('clientSIP','error','Invalid method.');
+      die();
     }
     
     $this->method = $method;
@@ -563,6 +342,7 @@ class PhpSIP
       $body.= "c=IN IP4 ".$this->src_ip."\r\n";
       $body.= "t=0 0\r\n";
       $body.= "m=audio 8000 RTP/AVP 0 8 18 3 4 97 98\r\n";
+      $body.= "m=audio 14582 RTP/AVP 0 8 3 101\r\n";
       $body.= "a=rtpmap:0 PCMU/8000\r\n";
       $body.= "a=rtpmap:18 G729/8000\r\n";
       $body.= "a=rtpmap:97 ilbc/8000\r\n";
@@ -589,12 +369,6 @@ class PhpSIP
       $this->setContentType(null);
     }
   }
-  
-  /**
-   * Sets SIP Proxy
-   * 
-   * @param $proxy
-   */
   public function setProxy($proxy)
   {
     $this->proxy = $proxy;
@@ -605,7 +379,8 @@ class PhpSIP
       
       if (!preg_match('/^[0-9]+$/',$temp[1]))
       {
-        throw new PhpSIPException("Invalid port number ".$temp[1]);
+        log::add('clientSIP','error',"Invalid port number ".$temp[1]);
+      die();
       }
       
       $this->host = $temp[0];
@@ -616,32 +391,22 @@ class PhpSIP
       $this->host = $this->proxy;
     }
   }
-  
-  /**
-   * Sets Contact header
-   * 
-   * @param $v
-   */
   public function setContact($v)
   {
     $this->contact = $v;
   }
-  
-  /**
-   * Sets request URI
-   *
-   * @param string $uri
-   */
   public function setUri($uri)
   {
     if (strpos($uri,'sip:') === false)
     {
-      throw new PhpSIPException("Only sip: URI supported.");
+      log::add('clientSIP','error',"Only sip: URI supported.");
+      die();
     }
     
     if (!$this->proxy && strpos($uri,'transport=tcp') !== false)
     {
-      throw new PhpSIPException("Only UDP transport supported.");
+      log::add('clientSIP','error',"Only UDP transport supported.");
+      die();
     }
     
     $this->uri = $uri;
@@ -673,7 +438,8 @@ class PhpSIP
       
       if (!$url = @parse_url($url))
       {
-        throw new PhpSIPException("Failed to parse URI '$url'.");
+        log::add('clientSIP','error',"Failed to parse URI '$url'.");
+      die();
       }
       
       $this->host = $url['host'];
@@ -684,57 +450,40 @@ class PhpSIP
       }
     }
   }
-  
-  /**
-   * Sets username
-   *
-   * @param string $username
-   */
+  public function rtsp()
+  {
+    return $this->rtsp;
+  }
   public function setUsername($username)
   {
     $this->username = $username;
   }
-  
-  /**
-   * Sets User Agent
-   *
-   * @param string $user_agent
-   */
   public function setUserAgent($user_agent)
   {
     $this->user_agent = $user_agent;
   }
-  
-  /**
-   * Sets password
-   *
-   * @param string $password
-   */
   public function setPassword($password)
   {
     $this->password = $password;
   }
-  
-  /**
-   * Sends SIP Request
-   * 
-   * @return string Reply 
-   */
   public function send()
   {
     if (!$this->from)
     {
-      throw new PhpSIPException('Missing From.');
+      log::add('clientSIP','error','Missing From.');
+      die();
     }
     
     if (!$this->method)
     {
-      throw new PhpSIPException('Missing Method.');
+      log::add('clientSIP','error','Missing Method.');
+      die();
     }
     
     if (!$this->uri)
     {
-      throw new PhpSIPException('Missing URI.');
+      log::add('clientSIP','error','Missing URI.');
+      die();
     }
     
     $data = $this->formatRequest();
@@ -794,25 +543,24 @@ class PhpSIP
     
     return $this->res_code;
   }
-  
-  /**
-   * Sends data
-   */
   private function sendData($data)
   {
     if (!$this->host)
     {
-      throw new PhpSIPException("Can't send data, host undefined");
+      log::add('clientSIP','error',"Can't send data, host undefined");
+      die();
     }
     
     if (!$this->port)
     {
-      throw new PhpSIPException("Can't send data, host undefined");
+      log::add('clientSIP','error',"Can't send data, host undefined");
+      die();
     }
     
     if (!$data)
     {
-      throw new PhpSIPException("Can't send - empty data");
+      log::add('clientSIP','error',"Can't send - empty data");
+      die();
     }
     
     if (preg_match('/^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$/', $this->host))
@@ -825,29 +573,21 @@ class PhpSIP
       
       if ($ip_address == $this->host)
       {
-        throw new PhpSIPException("DNS resolution of ".$this->host." failed");
+        log::add('clientSIP','error',"DNS resolution of ".$this->host." failed");
+      die();
       }
     }
     
     if (!@socket_sendto($this->socket, $data, strlen($data), 0, $ip_address, $this->port))
     {
       $err_no = socket_last_error($this->socket);
-      throw new PhpSIPException("Failed to send data to ".$ip_address.":".$this->port.". Source IP ".$this->src_ip.", source port: ".$this->src_port.". ".socket_strerror($err_no));
+      log::add('clientSIP','error',"Failed to send data to ".$ip_address.":".$this->port.". Source IP ".$this->src_ip.", source port: ".$this->src_port.". ".socket_strerror($err_no));
+      die();
     }
     
-    if ($this->debug)
-    {
-      $temp = explode("\r\n",$data);
+    log::add('clientSIP','info','TX : '.$data);
       
-      echo "--> ".$temp[0]."\n";
-    }
   }
-  
-  /**
-   * Listen for request
-   * 
-   * @param mixed $method string or array
-   */
   public function listen($methods)
   { 
     if (!is_array($methods))
@@ -855,10 +595,8 @@ class PhpSIP
       $methods = array($methods);
     }
     
-    if ($this->debug)
-    {
-      echo "Listenning for ".implode(", ",$methods)."\n";
-    }
+    log::add('clientSIP','debug',"Listenning for ".implode(", ",$methods));
+    
     
     if ($this->server_mode)
     {
@@ -885,7 +623,8 @@ class PhpSIP
         
         if ($i > 5)
         {
-          throw new PhpSIPException("Unexpected request ".$this->req_method." received.");
+          log::add('clientSIP','error',"Unexpected request ".$this->req_method." received.");
+      die();
         }
       }
     }
@@ -901,15 +640,12 @@ class PhpSIP
     if (!@socket_set_option($this->socket, SOL_SOCKET, SO_RCVTIMEO, array("sec"=>0,"usec"=>0)))
     {
       $err_no = socket_last_error($this->socket);
-      throw new PhpSIPException (socket_strerror($err_no));
+      log::add('clientSIP','error',socket_strerror($err_no));
+      die();
     }
     
     $this->server_mode = $v;
   }
-  
-  /**
-   * Reads incoming SIP message
-   */
   private function readMessage()
   {
     $from = "";
@@ -919,15 +655,11 @@ class PhpSIP
     if (!@socket_recvfrom($this->socket, $this->rx_msg, 10000, 0, $from, $port))
     {
       $this->res_code = "No final response in ".round($this->fr_timer/1000,3)." seconds. (".socket_last_error($this->socket).")";
+      die();
       return $this->res_code;
     }
     
-    if ($this->debug)
-    {
-      $temp = explode("\r\n",$this->rx_msg);
-      
-      echo "<-- ".$temp[0]."\n";
-    }
+    log::add('clientSIP','info','RX: '.$this->rx_msg);
     
     // Response
     $m = array();
@@ -944,20 +676,11 @@ class PhpSIP
     }
     
     // is diablog establised?
-    if (in_array(substr($this->res_code,0,1),array("1","2")) && $this->from_tag && $this->to_tag && $this->call_id)
+   /* if (in_array(substr($this->res_code,0,1),array("1","2")) && $this->from_tag && $this->to_tag && $this->call_id)
     {
-      if ($this->debug && !$this->dialog)
-      {
-        echo "  New dialog: ".$this->from_tag.'.'.$this->to_tag.'.'.$this->call_id."\n";
-      }
-      
-      $this->dialog = $this->from_tag.'.'.$this->to_tag.'.'.$this->call_id;
-    }
+      event::add('clientSIP::call', $this->from_tag.'.'.$this->to_tag.'.'.$this->call_id);
+    }*/
   }
-  
-  /**
-   * Parse Response
-   */
   private function parseResponse()
   {
     // Request via
@@ -982,6 +705,12 @@ class PhpSIP
       $this->to_tag = trim($m[1]);
     }
     
+    // Server Name
+    $m = array(); 
+    if (preg_match('/^Server: (.*)/im', $this->rx_msg, $m))
+    {
+      $this->server = trim($m[1]);
+    }
     // Response contact
     $this->res_contact = $this->parseContact();
     
@@ -996,10 +725,6 @@ class PhpSIP
     
     return $this->res_code;
   }
-  
-  /**
-   * Parse Request
-   */
   private function parseRequest()
   {
     $temp = explode("\r\n",$this->rx_msg);
@@ -1038,13 +763,17 @@ class PhpSIP
     $this->req_cseq_method = $this->parseCSeqMethod();
 
     // Request CSeq number
-    $m = array();
-    
+    $m = array(); 
     if (preg_match('/^CSeq: ([0-9]+)/im', $this->rx_msg, $m))
     {
       $this->req_cseq_number = trim($m[1]);
     }
-
+    // Server Name
+    $m = array(); 
+    if (preg_match('/^Server: (.*)/im', $this->rx_msg, $m))
+    {
+      $this->server = trim($m[1]);
+    }
     // Request From
     $m = array();
     if (preg_match('/^From: (.*)/im', $this->rx_msg, $m))
@@ -1086,14 +815,14 @@ class PhpSIP
         $this->call_id = trim($m[1]);
       }
     }
+    //RTSP information
+    $this->rtsp = $this->parseRtsp();
   }
-  
-  /**
-   * Send Response
-   * 
-   * @param int $code     Response code
-   * @param string $text  Response text
-   */
+  private function parseRtsp(){
+    $rtsp=substr($this->rx_msg,stripos($this->rx_msg,"Content-Length"));
+    $rtsp=substr($rtsp,stripos($rtsp,"\n")+1);
+    return $rtsp;
+  }
   public function reply($code, $text)
   {
     $r = 'SIP/2.0 '.$code.' '.$text."\r\n";
@@ -1122,9 +851,30 @@ class PhpSIP
     //CSeq
     $r.= 'CSeq: '.$this->req_cseq_number.' '.$this->req_cseq_method."\r\n";
     
-    // Max-Forwards
-    $r.= 'Max-Forwards: 70'."\r\n";
+    //Server
+    if($this->server)
+    {
+      $r.= 'Server: '.$this->server."\r\n";
+    }
     
+    $r.= "Allow: INVITE, ACK, CANCEL, OPTIONS, BYE, REFER, SUBSCRIBE, NOTIFY, INFO, PUBLISH, MESSAGE\r\n";
+    $r.= "Supported: replaces, timer\r\n";
+    
+    // Max-Forwards
+    //$r.= 'Max-Forwards: 70'."\r\n";
+     // Contact
+    if ($this->contact)
+    {
+      if (substr($this->contact,0,1) == "<") {
+        $r.= 'Contact: '.$this->contact."\r\n";
+      } else {
+        $r.= 'Contact: <'.$this->contact.'>'."\r\n";
+      }
+    }
+    else if ($this->method != 'MESSAGE')
+    {
+      $r.= 'Contact: <sip:'.$this->from_user.'@'.$this->src_ip.':'.$this->src_port.'>'."\r\n";
+    }
     // User-Agent
     $r.= 'User-Agent: '.$this->user_agent."\r\n";
     
@@ -1134,10 +884,6 @@ class PhpSIP
     
     $this->sendData($r);
   }
-  
-  /**
-   * ACK
-   */
   private function ack()
   {
     if ($this->res_cseq_method == 'INVITE' && $this->res_code == '200')
@@ -1175,7 +921,11 @@ class PhpSIP
     {
       $a.= 'To: '.$this->to."\r\n";
     }
-    
+    //Server
+    if($this->server)
+    {
+      $a.= 'Server: '.$this->server."\r\n";
+    }
     // Call-ID
     if (!$this->call_id)
     {
@@ -1205,12 +955,6 @@ class PhpSIP
     
     $this->sendData($a);
   }
-  
-  /**
-   * Formats SIP request
-   * 
-   * @return string
-   */
   private function formatRequest()
   {
     if ($this->res_contact && in_array($this->method,array('BYE','REFER','SUBSCRIBE')))
@@ -1254,6 +998,11 @@ class PhpSIP
       $r.= 'To: '.$this->to."\r\n";
     }
     
+    //Server
+    if($this->server)
+    {
+      $r.= 'Server: '.$this->server."\r\n";
+    }
     // Authentication
     if ($this->auth)
     {
@@ -1316,18 +1065,10 @@ class PhpSIP
     
     return $r;
   }
-  
-  /**
-   * Sets body
-   */
   public function setBody($body)
   {
     $this->body = $body;
   }
-  
-  /**
-   * Sets Content Type
-   */
   public function setContentType($content_type = null)
   {
     if ($content_type !== null)
@@ -1349,51 +1090,23 @@ class PhpSIP
       }
     }
   }
-  
-  /**
-   * Sets Via header
-   */
   private function setVia()
   {
     $rand = rand(100000,999999);
     $this->via = 'SIP/2.0/UDP '.$this->src_ip.':'.$this->src_port.';rport;branch=z9hG4bK'.$rand;
   }
-  
-  /**
-   * Sets from tag
-   * 
-   * @param string $v
-   */
   public function setFromTag($v)
   {
     $this->from_tag = $v;
   }
-  
-  /**
-   * Sets to tag
-   * 
-   * @param string $v
-   */
   public function setToTag($v)
   {
     $this->to_tag = $v;
   }
-  
-  /**
-   * Sets cseq
-   * 
-   * @param string $v
-   */
   public function setCseq($v)
   { 
     $this->cseq = $v;
   }
-  
-  /**
-   * Sets call id
-   * 
-   * @param string $v
-   */
   public function setCallId($v = null)
   {
     if ($v)
@@ -1405,14 +1118,6 @@ class PhpSIP
       $this->call_id = md5(uniqid()).'@'.$this->src_ip;
     }
   }
-  
-  /**
-   * Gets value of the header from the previous request
-   * 
-   * @param string $name Header name
-   * 
-   * @return string or false
-   */
   public function getHeader($name)
   {
     $m = array();
@@ -1426,12 +1131,6 @@ class PhpSIP
       return false;
     }
   }
-  
-  /**
-   * Gets body from previous request
-   * 
-   * @return string
-   */
   public function getBody()
   {
     $temp = explode("\r\n\r\n",$this->rx_msg);
@@ -1443,28 +1142,26 @@ class PhpSIP
     
     return $temp[1];
   }
-  
-  /**
-   * Calculates Digest authentication response
-   * 
-   */
   private function auth()
   {
     if (!$this->username)
     {
-      throw new PhpSIPException("Missing username");
+      log::add('clientSIP','error',"Missing username");
+      die();
     }
     
     if (!$this->password)
     {
-      throw new PhpSIPException("Missing password");
+      log::add('clientSIP','error',"Missing password");
+      die();
     }
     
     // realm
     $m = array();
     if (!preg_match('/^Proxy-Authenticate: .* realm="(.*)"/imU',$this->rx_msg, $m))
     {
-      throw new PhpSIPException("Can't find realm in proxy-auth");
+      log::add('clientSIP','error',"Can't find realm in proxy-auth");
+      die();
     }
     
     $realm = $m[1];
@@ -1473,7 +1170,8 @@ class PhpSIP
     $m = array();
     if (!preg_match('/^Proxy-Authenticate: .* nonce="(.*)"/imU',$this->rx_msg, $m))
     {
-      throw new PhpSIPException("Can't find nonce in proxy-auth");
+      log::add('clientSIP','error',"Can't find nonce in proxy-auth");
+      die();
     }
     
     $nonce = $m[1];
@@ -1485,21 +1183,18 @@ class PhpSIP
     
     $this->auth = 'Proxy-Authorization: Digest username="'.$this->username.'", realm="'.$realm.'", nonce="'.$nonce.'", uri="'.$this->uri.'", response="'.$res.'", algorithm=MD5';
   }
-  
-  /**
-   * Calculates WWW authorization response
-   * 
-   */
   private function authWWW()
   {
     if (!$this->username)
     {
-      throw new PhpSIPException("Missing auth username");
+      log::add('clientSIP','error',"Missing auth username");
+      die();
     }
     
     if (!$this->password)
     {
-      throw new PhpSIPException("Missing auth password");
+      log::add('clientSIP','error',"Missing auth password");
+      die();
     }
     
     $qop_present = false;
@@ -1510,7 +1205,8 @@ class PhpSIP
       // we can only do qop="auth"
       if  (strpos($this->rx_msg,'qop="auth"') === false)
       {
-        throw new PhpSIPException('Only qop="auth" digest authentication supported.');
+        log::add('clientSIP','error','Only qop="auth" digest authentication supported.');
+      die();
       }
     }
     
@@ -1518,7 +1214,8 @@ class PhpSIP
     $m = array();
     if (!preg_match('/^WWW-Authenticate: .* realm="(.*)"/imU',$this->rx_msg, $m))
     {
-      throw new PhpSIPException("Can't find realm in www-auth");
+      log::add('clientSIP','error',"Can't find realm in www-auth");
+      die();
     }
     
     $realm = $m[1];
@@ -1527,7 +1224,8 @@ class PhpSIP
     $m = array();
     if (!preg_match('/^WWW-Authenticate: .* nonce="(.*)"/imU',$this->rx_msg, $m))
     {
-      throw new PhpSIPException("Can't find nonce in www-auth");
+      log::add('clientSIP','error',"Can't find nonce in www-auth");
+      die();
     }
     
     $nonce = $m[1];
@@ -1553,31 +1251,28 @@ class PhpSIP
       $this->auth.= ', qop="auth", nc="00000001", cnonce="'.$cnonce.'"';
     }
   }
-  
-  /**
-   * Create network socket
-   *
-   * @return bool True on success
-   */
   private function createSocket()
   { 
     $this->getPort();
     
     if (!$this->src_ip)
     {
-      throw new PhpSIPException("Source IP not defined.");
+      log::add('clientSIP','error',"Source IP not defined.");
+      die();
     }
     
     if (!$this->socket = @socket_create(AF_INET, SOCK_DGRAM, SOL_UDP))
     {
       $err_no = socket_last_error($this->socket);
-      throw new PhpSIPException (socket_strerror($err_no));
+      log::add('clientSIP','error',socket_strerror($err_no));
+      die();
     }
     
     if (!@socket_bind($this->socket, $this->src_ip, $this->src_port))
     {
       $err_no = socket_last_error($this->socket);
-      throw new PhpSIPException ("Failed to bind ".$this->src_ip.":".$this->src_port." ".socket_strerror($err_no));
+      log::add('clientSIP','error',"Failed to bind ".$this->src_ip.":".$this->src_port." ".socket_strerror($err_no));
+      die();
     }
     
     $microseconds = $this->fr_timer * 1000;
@@ -1589,32 +1284,23 @@ class PhpSIP
     if (!@socket_set_option($this->socket, SOL_SOCKET, SO_RCVTIMEO, array("sec"=>$sec,"usec"=>$usec)))
     {
       $err_no = socket_last_error($this->socket);
-      throw new PhpSIPException (socket_strerror($err_no));
+      log::add('clientSIP','error',socket_strerror($err_no));
+      die();
     }
     
     if (!@socket_set_option($this->socket, SOL_SOCKET, SO_SNDTIMEO, array("sec"=>5,"usec"=>0)))
     {
       $err_no = socket_last_error($this->socket);
-      throw new PhpSIPException (socket_strerror($err_no));
+      log::add('clientSIP','error',socket_strerror($err_no));
+      die();
     }
   }
-  
-  /**
-   * Close the connection
-   *
-   * @return bool True on success
-   */
   private function closeSocket()
   {
     socket_close($this->socket);
     
     $this->releasePort();
   }
-  
-  /**
-   * Resets callid, to/from tags etc.
-   * 
-   */
   public function newCall()
   {
     $this->cseq = 20;
@@ -1653,12 +1339,6 @@ class PhpSIP
     
     $this->routes = array();
   }
-
-  /**
-   * Parses Record-Route header
-   * 
-   * @return array
-   */
   private function parseRecordRoute()
   {
     $this->record_route = array();
@@ -1681,12 +1361,6 @@ class PhpSIP
       }
     }
   }
-  
-  /**
-   * Parses Contact header
-   * 
-   * @return string ro null
-   */
   private function parseContact()
   {
     $output = null;
@@ -1707,12 +1381,6 @@ class PhpSIP
     
     return $output;
   }
-
-  /**
-   * Parse METHOD from CSeq header
-   * 
-   * @return string or null
-   */
   private function parseCSeqMethod()
   {
     $output = null;
@@ -1727,5 +1395,4 @@ class PhpSIP
     return $output;
   }
 }
-
 ?>
