@@ -2,7 +2,6 @@
 try {
 	require_once dirname(__FILE__) . '/../../../../core/php/core.inc.php';
     	include_file('core', 'authentification', 'php');
-	include_file('core', 'dpt', 'class', 'eibd');
     	if (!isConnect('admin')) {
         	throw new Exception(__('401 - Accès non autorisé', __FILE__));
     	}
