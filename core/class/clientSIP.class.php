@@ -10,7 +10,7 @@ class clientSIP extends eqLogic {
 		$return['state'] = 'nok';
 		foreach(eqLogic::byType('clientSIP') as $clientSIP){
 			if($clientSIP->getIsEnable()){
-				$cron = cron::byClassAndFunction('clientSIP', 'Register', array('id' => $clientSIP->getId()));
+				$cron = cron::byClassAndFunction('clientSIP', 'updateRegister', array('id' => $clientSIP->getId()));
 				if (!is_object($cron)) 	
 					return $return;
 				$cron = cron::byClassAndFunction('clientSIP', 'ConnectSip', array('id' => $clientSIP->getId()));
@@ -40,7 +40,7 @@ class clientSIP extends eqLogic {
 			 $clientSIP->_sip=null;
 			$clientSIP->checkAndUpdateCmd('RegStatus','Inactif');
 			$clientSIP->checkAndUpdateCmd('CallStatus','Racrocher');
-			$cron = cron::byClassAndFunction('clientSIP', 'Register', array('id' => $clientSIP->getId()));
+			$cron = cron::byClassAndFunction('clientSIP', 'updateRegister', array('id' => $clientSIP->getId()));
 			if (is_object($cron)) 	
 				$cron->remove();
 			$cron = cron::byClassAndFunction('clientSIP', 'ConnectSip', array('id' => $clientSIP->getId()));
@@ -75,11 +75,11 @@ class clientSIP extends eqLogic {
 	        'optionalParameters' => true,
 	));
 	public function CreateDemon() {
-		$cron =cron::byClassAndFunction('clientSIP', 'Register', array('id' => $this->getId()));
+		$cron =cron::byClassAndFunction('clientSIP', 'updateRegister', array('id' => $this->getId()));
 		if (!is_object($cron)) {
 			$cron = new cron();
 			$cron->setClass('clientSIP');
-			$cron->setFunction('Register');
+			$cron->setFunction('updateRegister');
 			$cron->setOption(array('id' => $this->getId()));
 			$cron->setEnable(1);
 			$minute=round($this->getConfiguration('Expiration')/60,0);
@@ -112,44 +112,51 @@ class clientSIP extends eqLogic {
 		log::add('clientSIP', 'debug', 'Objet mis à jour => ' . json_encode($_option));
 		$clientSIP = clientSIP::byId($_option['id']);
 		if (is_object($clientSIP) && $clientSIP->getIsEnable()) {
-			$Host=config::byKey('Host', 'clientSIP');
-			$Port=config::byKey('Port', 'clientSIP');
-			try {	
-				while(!is_object($clientSIP->_sip));
-				while($clientSIP->getCmd(null,'RegStatus')->execCmd() == 'Enregistrer');
-				while(true){
-					$clientSIP->_sip->newCall();
-					$clientSIP->_sip->listen('INVITE');
-					$clientSIP->RepondreAppel();
-				}
-			} catch (Exception $e) {
-				die("Caught exception ".$e->getMessage."\n");
-			}
-			
+			$clientSIP->Listen();
 		}
 	}
-	public static function Register($_option){
+	public static function updateRegister($_option){
 		log::add('clientSIP', 'debug', 'Objet mis à jour => ' . json_encode($_option));
 		$clientSIP = clientSIP::byId($_option['id']);
 		if (is_object($clientSIP) && $clientSIP->getIsEnable()) {
-			$Host=config::byKey('Host', 'clientSIP');
-			$Port=config::byKey('Port', 'clientSIP');
-			$Username=$clientSIP->getConfiguration("Username");
-			$Password=$clientSIP->getConfiguration("Password");
-	
-			$clientSIP->checkAndUpdateCmd('RegStatus','Inactif');
-			if(!is_object($clientSIP->_sip))
-				$clientSIP->_sip= new sip($Host); 
-			$clientSIP->_sip->setUsername($Username);
-			$clientSIP->_sip->setPassword($Password);
-			$clientSIP->_sip->setMethod('REGISTER');
-			//$clientSIP->_sip->setProxy($Host.':'.$Port);
-			$clientSIP->_sip->setFrom('sip:'.$Username.'@'.$Host/*.':'.$Port*/);
-			$clientSIP->_sip->setUri('sip:'.$Username.'@'.$Host.';transport='.$clientSIP->getConfiguration("transport"));
-			$clientSIP->_sip->setServerMode(true);
-			$res = $clientSIP->_sip->send();
-			$clientSIP->checkAndUpdateCmd('RegStatus','Enregistrer');			
+			$clientSIP->Register();		
 		}
+	}
+	public function Register(){
+		$Host=config::byKey('Host', 'clientSIP');
+		$Port=config::byKey('Port', 'clientSIP');
+		$Username=$this->getConfiguration("Username");
+		$Password=$this->getConfiguration("Password");
+
+		$this->checkAndUpdateCmd('RegStatus','Inactif');
+		if(!is_object($this->_sip))
+			$this->_sip= new sip($Host); 
+		$this->_sip->setUsername($Username);
+		$this->_sip->setPassword($Password);
+		$this->_sip->setMethod('REGISTER');
+		//$this->_sip->setProxy($Host.':'.$Port);
+		$this->_sip->setFrom('sip:'.$Username.'@'.$Host/*.':'.$Port*/);
+		$this->_sip->setUri('sip:'.$Username.'@'.$Host.';transport='.$this->getConfiguration("transport"));
+		$this->_sip->setServerMode(true);
+		$res = $this->_sip->send();
+		$this->checkAndUpdateCmd('RegStatus','Enregistrer');			
+		
+	}	
+	public function Listen(){
+		$Host=config::byKey('Host', 'clientSIP');
+		$Port=config::byKey('Port', 'clientSIP');
+		try {	
+			if(!is_object($this->_sip))
+				$this->Register();
+			while($this->getCmd(null,'RegStatus')->execCmd() == 'Enregistrer');
+			while(true){
+				$this->_sip->newCall();
+				$this->_sip->listen('INVITE');
+				$this->RepondreAppel();
+			}
+		} catch (Exception $e) {
+			die("Caught exception ".$e->getMessage."\n");
+		}	
 	}
 	public function RepondreAppel() {
 		//$this->_sip->reply(100,'Trying');
