@@ -163,8 +163,8 @@ class clientSIP extends eqLogic {
 		$call['status']='ringing'; 
 		$call['flow']='incoming';  
 		$call['number']='';  
-		$call['start']=date();  
-		$this->addHistoryCall($call)
+		$call['start']=date('d/m/Y H:i:s');  
+		$this->addHistoryCall($call);
 		//$sip->reply(100,'Trying');
 		$sip->reply(180,'Ringing');
 		$this->checkAndUpdateCmd('CallStatus','Sonnerie');
