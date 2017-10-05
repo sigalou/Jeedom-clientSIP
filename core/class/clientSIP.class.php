@@ -138,9 +138,11 @@ class clientSIP extends eqLogic {
 		$sip->setServerMode(true);
 		$res = $sip->send();
 		$this->checkAndUpdateCmd('RegStatus','Enregistrer');	
-		$sip->newCall();
-		$sip->listen('INVITE');
-		$this->RepondreAppel($sip);		
+		while(true){
+			$sip->newCall();
+			$sip->listen('INVITE');
+			$this->RepondreAppel();
+		}	
 	}	
 /*	public function Listen(){
 		$Host=config::byKey('Host', 'clientSIP');
@@ -168,22 +170,22 @@ class clientSIP extends eqLogic {
 		$sip->reply(180,'Ringing');
 		$this->checkAndUpdateCmd('CallStatus','Sonnerie');
 		event::add('clientSIP::call', utils::o2a($this));
-		while($this->getCmd(null,'CallStatus')->execCmd() == 'Sonnerie');
-		$call['start']= date('d-m-Y H:i:s');
+		$CallStatus=$this->getCmd(null,'CallStatus');
 		$call['status']= 'ringing';
-		$call['status']= 'incoming';
+		while($CallStatus->execCmd() == 'Sonnerie');
 		self::addCacheMonitor($call);
-		switch($this->getCmd(null,'CallStatus')->execCmd()){
+		switch($CallStatus->execCmd()){
 			case 'Decrocher':
+				$call['status']= 'call';
 				$this->Decrocher($sip);
-				$call['status']= 'open';
-				self::addCacheMonitor($call);
 			break;
-			case 'Racrocher':;
+			case 'Racrocher':
+				$call['status']= 'reject';
 				$this->Racrocher($sip);
 			return;
 		}
-		while($this->getCmd(null,'CallStatus')->execCmd() == 'Decrocher');
+		self::addHistoryCall($call);
+		while($CallStatus->execCmd() == 'Decrocher');
 		$this->Racrocher();
 	}
 	public function Decrocher($sip) {
