@@ -10,12 +10,12 @@ class clientSIP extends eqLogic {
 		$return['state'] = 'nok';
 		foreach(eqLogic::byType('clientSIP') as $clientSIP){
 			if($clientSIP->getIsEnable()){
-				$cron = cron::byClassAndFunction('clientSIP', 'updateRegister', array('id' => $clientSIP->getId()));
-				if (!is_object($cron)) 	
-					return $return;
-				/*$cron = cron::byClassAndFunction('clientSIP', 'ConnectSip', array('id' => $clientSIP->getId()));
+				/*$cron = cron::byClassAndFunction('clientSIP', 'updateRegister', array('id' => $clientSIP->getId()));
 				if (!is_object($cron)) 	
 					return $return;*/
+				$cron = cron::byClassAndFunction('clientSIP', 'ConnectSip', array('id' => $clientSIP->getId()));
+				if (!is_object($cron)) 	
+					return $return;
 			}
 		}
 		$return['state'] = 'ok';
@@ -43,9 +43,9 @@ class clientSIP extends eqLogic {
 			$cron = cron::byClassAndFunction('clientSIP', 'updateRegister', array('id' => $clientSIP->getId()));
 			if (is_object($cron)) 	
 				$cron->remove();
-			/*$cron = cron::byClassAndFunction('clientSIP', 'ConnectSip', array('id' => $clientSIP->getId()));
+			$cron = cron::byClassAndFunction('clientSIP', 'ConnectSip', array('id' => $clientSIP->getId()));
 			if (is_object($cron)) 	
-				$cron->remove();*/
+				$cron->remove();
 		}
 	}	
 	public function toHtml($_version = 'mobile') {
@@ -75,25 +75,7 @@ class clientSIP extends eqLogic {
 	        'optionalParameters' => true,
 	));
 	public function CreateDemon() {
-		$cron =cron::byClassAndFunction('clientSIP', 'updateRegister', array('id' => $this->getId()));
-		if (!is_object($cron)) {
-			$cron = new cron();
-			$cron->setClass('clientSIP');
-			$cron->setFunction('updateRegister');
-			$cron->setOption(array('id' => $this->getId()));
-			$cron->setEnable(1);
-			$minute=round($this->getConfiguration('Expiration')/60,0);
-			$second=$this->getConfiguration('Expiration')-$minute*60;
-			if($minute>60){
-				$heure='*/'.round($minute/60,0);
-				$minute=$minute-$heure*60;
-			}
-			else
-				$heure='*';
-			$cron->setSchedule('*/'.$minute.' '.$heure.' * * *');
-			$cron->save();
-		}
-	/*	$cron =cron::byClassAndFunction('clientSIP', 'ConnectSip', array('id' => $this->getId()));
+		$cron =cron::byClassAndFunction('clientSIP', 'ConnectSip', array('id' => $this->getId()));
 		if (!is_object($cron)) {
 			$cron = new cron();
 			$cron->setClass('clientSIP');
@@ -104,17 +86,17 @@ class clientSIP extends eqLogic {
 			$cron->setSchedule('* * * * *');
 			$cron->setTimeout($minute);
 			$cron->save();
-		}*/
+		}
 		$cron->start();
 		$cron->run();
 	}
-	/*public static function ConnectSip($_option){
+	public static function ConnectSip($_option){
 		log::add('clientSIP', 'debug', 'Objet mis à jour => ' . json_encode($_option));
 		$clientSIP = clientSIP::byId($_option['id']);
 		if (is_object($clientSIP) && $clientSIP->getIsEnable()) {
 			$clientSIP->Listen();
 		}
-	}*/
+	}
 	public static function updateRegister($_option){
 		log::add('clientSIP', 'debug', 'Objet mis à jour => ' . json_encode($_option));
 		$clientSIP = clientSIP::byId($_option['id']);
@@ -138,19 +120,15 @@ class clientSIP extends eqLogic {
 		$sip->setServerMode(true);
 		$res = $sip->send();
 		$this->checkAndUpdateCmd('RegStatus','Enregistrer');	
-		while(true){
-			$sip->newCall();
-			$sip->listen('INVITE');
-			$this->RepondreAppel();
-		}	
+      	return $sip;
 	}	
-/*	public function Listen(){
+	public function Listen(){
 		$Host=config::byKey('Host', 'clientSIP');
 		$Port=config::byKey('Port', 'clientSIP');
 		try {	
 			if(!is_object($sip))
-				$this->Register();
-			while($this->getCmd(null,'RegStatus')->execCmd() == 'Enregistrer');
+				$sip=$this->Register();
+			//while($this->getCmd(null,'RegStatus')->execCmd() == 'Enregistrer');
 			while(true){
 				$sip->newCall();
 				$sip->listen('INVITE');
@@ -159,7 +137,7 @@ class clientSIP extends eqLogic {
 		} catch (Exception $e) {
 			die("Caught exception ".$e->getMessage."\n");
 		}	
-	}*/
+	}
 	public function RepondreAppel($sip) {
 		$call['status']='ringing'; 
 		$call['flow']='incoming';  
@@ -210,13 +188,15 @@ class clientSIP extends eqLogic {
 		$Port=config::byKey('Port', 'clientSIP');
 		$Username=$this->getConfiguration("Username");
 		$Password=$this->getConfiguration("Password");
+		$this->checkAndUpdateCmd('RegStatus','Inactif');
 		$sip= new sip(network ::getNetworkAccess('internal', 'ip', '', false)); 
 		$sip->setUsername($Username);
 		$sip->setPassword($Password);
+		$sip->setMethod('REGISTER');
 		$this->checkAndUpdateCmd('CallStatus','Racrocher');
 		$sip->newCall();
 		$sip->setFrom('sip:'.$Username.'@'.$Host);
-		$sip->setUri('sip:'.$Username.'@'.$Host.';transport='.$this->getConfiguration("transport"));
+		$sip->setUri('sip:'.$number.'@'.$Host.';transport='.$this->getConfiguration("transport"));
 		$sip->setTo('sip:'.$number.'@'.$Host);
 		$sip->setMethod('INVITE');
 		$this->checkAndUpdateCmd('CallStatus','Appel en cours');
