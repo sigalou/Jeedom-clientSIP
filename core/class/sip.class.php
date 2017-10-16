@@ -1,7 +1,7 @@
 <?php
 class sip
 {
-  private $min_port = 5065;
+  private $min_port = 5060;
   private $max_port = 5265;
   private $fr_timer = 10000;
   private $lock_file = '/var/www/html/tmp/PhpSIP.lock';
