@@ -128,7 +128,7 @@ class clientSIP extends eqLogic {
 		$Username=$this->getConfiguration("Username");
 		$Password=$this->getConfiguration("Password");
 		$this->checkAndUpdateCmd('RegStatus','Inactif');
-		$sip= new sip($Host); 
+		$sip= new sip(network ::getNetworkAccess('internal', 'ip', '', false)); 
 		$sip->setUsername($Username);
 		$sip->setPassword($Password);
 		$sip->setMethod('REGISTER');
@@ -210,7 +210,7 @@ class clientSIP extends eqLogic {
 		$Port=config::byKey('Port', 'clientSIP');
 		$Username=$this->getConfiguration("Username");
 		$Password=$this->getConfiguration("Password");
-		$sip= new sip($Host); 
+		$sip= new sip(network ::getNetworkAccess('internal', 'ip', '', false)); 
 		$sip->setUsername($Username);
 		$sip->setPassword($Password);
 		$this->checkAndUpdateCmd('CallStatus','Racrocher');
