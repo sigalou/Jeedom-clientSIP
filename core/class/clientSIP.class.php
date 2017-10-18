@@ -120,7 +120,7 @@ class clientSIP extends eqLogic {
 				//$_sip->setProxy($Host.':'.$Port);
 				$_sip->setFrom('sip:'.$Username.'@'.$Host/*.':'.$Port*/);
 				$_sip->setUri('sip:'.$Username.'@'.$Host.';transport='.$clientSIP->getConfiguration("transport"));
-				//$_sip->setServerMode(true);
+				$_sip->setServerMode(true);
 				$res = $_sip->send();
 				$clientSIP->checkAndUpdateCmd('RegStatus','Enregistrer');	
 				sleep($clientSIP->getConfiguration("Expiration"));
