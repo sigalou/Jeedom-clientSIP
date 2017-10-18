@@ -110,7 +110,7 @@ class clientSIP extends eqLogic {
 			$Port=config::byKey('Port', 'clientSIP');
 			$Username=$clientSIP->getConfiguration("Username");
 			$Password=$clientSIP->getConfiguration("Password");
-			$_sip = new sip(network ::getNetworkAccess('internal', 'ip', '', false));
+			$_sip = new sip($clientSIP->getId(),network ::getNetworkAccess('internal', 'ip', '', false));
 			while(true){
 				$clientSIP->checkAndUpdateCmd('RegStatus','Inactif');
 				$_sip->setUsername($Username);
@@ -135,7 +135,7 @@ class clientSIP extends eqLogic {
 			$Port=config::byKey('Port', 'clientSIP');
 			$Username=$clientSIP->getConfiguration("Username");
 			$Password=$clientSIP->getConfiguration("Password");
-			$_sip = new sip(network ::getNetworkAccess('internal', 'ip', '', false));
+			$_sip = new sip($clientSIP->getId(),network ::getNetworkAccess('internal', 'ip', '', false));
 			while(true){
 				$_sip->setUsername($Username);
 				$_sip->setPassword($Password);
@@ -196,7 +196,7 @@ class clientSIP extends eqLogic {
 		$Username=$this->getConfiguration("Username");
 		$Password=$this->getConfiguration("Password");
 		$this->checkAndUpdateCmd('CallStatus','Racrocher');	
-		$_sip = new sip(network ::getNetworkAccess('internal', 'ip', '', false));
+		$_sip = new sip($clientSIP->getId(),network ::getNetworkAccess('internal', 'ip', '', false));
 		$_sip->setUsername($Username);
 		$_sip->setPassword($Password);
 		$_sip->newCall();
@@ -206,24 +206,6 @@ class clientSIP extends eqLogic {
 		$_sip->setMethod('INVITE');
 		$this->checkAndUpdateCmd('CallStatus','Appel en cours');
 		$res=$_sip->send();
-		$call['status']='ringing'; 
-		$call['flow']='outcoming';  
-		$call['number']=$number;  
-		$call['start']=date('d/m/Y H:i:s');  
-		self::addHistoryCall($call);
-		switch($res){
-			case '200':
-				$this->checkAndUpdateCmd('CallStatus','Décroché');
-				$this->Decrocher($_sip);
-			break;
-			case '318':
-				$this->checkAndUpdateCmd('CallStatus','Sonnerie');
-			break;
-			default:
-				$this->checkAndUpdateCmd('CallStatus','Racrocher');
-				$this->Racrocher($_sip);
-			break;
-		}
 	}
 	public static function addHistoryCall($_call) {
 		$cache = cache::byKey('clientSIP::HistoryCall');
