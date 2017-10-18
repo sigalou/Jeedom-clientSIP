@@ -115,6 +115,7 @@ class clientSIP extends eqLogic {
 				$clientSIP->checkAndUpdateCmd('RegStatus','Inactif');
 				$_sip->setUsername($Username);
 				$_sip->setPassword($Password);
+				$_sip->addHeader('Expires: '.$clientSIP->getConfiguration("Expiration"));
 				$_sip->setMethod('REGISTER');
 				//$_sip->setProxy($Host.':'.$Port);
 				$_sip->setFrom('sip:'.$Username.'@'.$Host/*.':'.$Port*/);
