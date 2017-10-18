@@ -53,8 +53,10 @@ class sip
   private $record_route = array();
   private $request_via = array();
   private $extra_headers = array();
-  public function __construct($src_ip = null, $src_port = null, $fr_timer = null)
+  private $jeedomId='';
+  public function __construct($jeedomId,$src_ip = null, $src_port = null, $fr_timer = null)
   {
+    $this->jeedomId=$jeedomId;
     if (!function_exists('socket_create'))
     {
       log::add('clientSIP','error',"socket_create() function missing.");
@@ -674,12 +676,30 @@ class sip
     {
       $this->parseRequest();
     }
-    
-    // is diablog establised?
-   /* if (in_array(substr($this->res_code,0,1),array("1","2")) && $this->from_tag && $this->to_tag && $this->call_id)
-    {
-      event::add('clientSIP::call', $this->from_tag.'.'.$this->to_tag.'.'.$this->call_id);
-    }*/
+     // $this->actionResCode();
+  }
+
+  private function actionResCode(){
+    $client=eqLogic::byId($this->jeedomId));
+    if(is_object($client)){
+      switch($this->res_code){
+      case 100:
+       $client->checkAndUpdateCmd('CallStatus','Appel en cours');
+        $this->reply(100,'Trying');
+      break;
+      case 180:
+	      $client->checkAndUpdateCmd('CallStatus','Sonnerie');
+        $this->reply(180,'Ringing');
+      break;
+			case '200':
+				$client->checkAndUpdateCmd('CallStatus','Décroché');
+        $this->reply(200,'OK');
+			break;
+			case '486':
+				$client->checkAndUpdateCmd('CallStatus','Décroché');
+			break;
+      }
+    }
   }
   private function parseResponse()
   {
