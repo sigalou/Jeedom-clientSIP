@@ -680,7 +680,7 @@ class sip
   }
 
   private function actionResCode(){
-    $client=eqLogic::byId($this->jeedomId));
+    $client=eqLogic::byId($this->jeedomId);
     if(is_object($client)){
       switch($this->res_code){
       case 100:
