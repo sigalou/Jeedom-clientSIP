@@ -419,7 +419,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_description">1. Description</a></li>
 <li><a href="#_installation_et_configuration">2. Installation et configuration</a></li>
 <li><a href="#_paramétrage_des_equipements_et_des_commandes">3. Paramétrage des equipements et des commandes</a></li>
-<li><a href="#_faq">4. FAQ</a></li>
+<li><a href="#_commandes_jeedom">4. Commandes jeedom</a></li>
 </ul>
 </div>
 </div>
@@ -435,19 +435,85 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="sect1">
 <h2 id="_installation_et_configuration">2. Installation et configuration</h2>
 <div class="sectionbody">
-
+<div class="paragraph">
+<p>Pour utiliser se plugin, il est impératif d&#8217;avoir configurer un serveur sip et d&#8217;y saisir les informations de connexions</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="../images/ServerSip.jpg" alt="ServerSip">
+</div>
+</div>
 </div>
 </div>
 <div class="sect1">
 <h2 id="_paramétrage_des_equipements_et_des_commandes">3. Paramétrage des equipements et des commandes</h2>
 <div class="sectionbody">
-
+<div class="paragraph">
+<p>Avant de commancer le parametrage du client sur jeedom, il est impératif de l&#8217;avoir cree sur votre serveur</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="../images/ClientSipConfiguration.jpg" alt="ClientSipConfiguration">
+</div>
+</div>
+<div class="paragraph">
+<p>La configuration du client se deroule en 2 partie, la premiere la configuration général a jeedom que je ne detaillerai pas dans cette doc, et la seconde spécifique au clients.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Saisir les informations d&#8217;autentificaiton sur le serveur</p>
+</li>
+<li>
+<p>Saisir le temps d&#8217;expiration</p>
+</li>
+<li>
+<p>Choisir le type de transport</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Un fois sauvgarder jeedom communiquera avec votre reseau sip</p>
+</div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_faq">4. FAQ</h2>
+<h2 id="_commandes_jeedom">4. Commandes jeedom</h2>
 <div class="sectionbody">
-
+<div class="paragraph">
+<p>La liste si dessous décrit chaque commande disponible sous jeedom</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Etat connexion: Cette commande reflete l&#8217;etat du client sur le reseau sip</p>
+</li>
+<li>
+<p>Inactif: le client n&#8217;est pas enregister et il ne sera pas possible de passer ou recevoir un appel</p>
+</li>
+<li>
+<p>Enregistrer: le client peut passer ou recevoir un appel</p>
+</li>
+<li>
+<p>Etat appel: cette commande determine l&#8217;etat de la ligne</p>
+</li>
+<li>
+<p>Racrocher: la ligne est libre</p>
+</li>
+<li>
+<p>Appel en cours: jeedom compose un numero et attend le retour du serveur</p>
+</li>
+<li>
+<p>Sonnerie: Un appel est en cours et attend un reponse</p>
+</li>
+<li>
+<p>Décrocher: Un appel est en cours de conversation</p>
+</li>
+<li>
+<p>Appel: Cette commande permet de saisir un numero d&#8217;appel</p>
+</li>
+</ul>
+</div>
 </div>
 </div>
 </div>
