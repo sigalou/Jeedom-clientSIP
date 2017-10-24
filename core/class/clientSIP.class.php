@@ -111,7 +111,7 @@ class clientSIP extends eqLogic {
 			$Username=$clientSIP->getConfiguration("Username");
 			$Password=$clientSIP->getConfiguration("Password");
 			$_sip = new sip($clientSIP->getId(),network ::getNetworkAccess('internal', 'ip', '', false));
-			while(true){
+			//while(true){
 				$clientSIP->checkAndUpdateCmd('RegStatus','Inactif');
 				$_sip->setUsername($Username);
 				$_sip->setPassword($Password);
@@ -124,7 +124,7 @@ class clientSIP extends eqLogic {
 				$res = $_sip->send();
 				$clientSIP->checkAndUpdateCmd('RegStatus','Enregistrer');	
 				sleep($clientSIP->getConfiguration("Expiration"));
-			}
+			//}
 		}
 	}
 	public static function WaitCall($_option){
