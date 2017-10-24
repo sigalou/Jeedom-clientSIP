@@ -80,8 +80,8 @@ class clientSIP extends eqLogic {
 			$cron->setFunction('ConnectSip');
 			$cron->setOption(array('id' => $this->getId()));
 			$cron->setEnable(1);
-			$cron->setDeamon(1);
-			$cron->setSchedule('*/'.$this->getConfiguration("Expiration").' * * * *');
+			$minute=round($this->getConfiguration("Expiration")/60,0);
+			$cron->setSchedule('*/'.$minute.' * * * *');
 			$cron->save();
 		}
 		$cron->start();
