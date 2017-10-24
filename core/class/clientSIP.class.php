@@ -81,8 +81,7 @@ class clientSIP extends eqLogic {
 			$cron->setOption(array('id' => $this->getId()));
 			$cron->setEnable(1);
 			$cron->setDeamon(1);
-			$cron->setSchedule('* * * * *');
-			$cron->setTimeout($minute);
+			$cron->setSchedule('*/'.$this->getConfiguration("Expiration").' * * * *');
 			$cron->save();
 		}
 		$cron->start();
@@ -123,7 +122,7 @@ class clientSIP extends eqLogic {
 				$_sip->setServerMode(true);
 				$res = $_sip->send();
 				$clientSIP->checkAndUpdateCmd('RegStatus','Enregistrer');	
-				sleep($clientSIP->getConfiguration("Expiration"));
+				//sleep($clientSIP->getConfiguration("Expiration"));
 			//}
 		}
 	}
