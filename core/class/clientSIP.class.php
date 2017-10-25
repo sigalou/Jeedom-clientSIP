@@ -170,7 +170,7 @@ class clientSIP extends eqLogic {
 		}
 		self::addHistoryCall($call);
 	}
-	public function Decrocher($_sip) {
+	public function Decrocher($_sip='') {
 		//ajouter les options de compatibilité de jeedom
 		$_sip->reply(200,'Ok');
 		event::add('clientSIP::rtsp', $_sip->rtsp());
@@ -185,7 +185,7 @@ class clientSIP extends eqLogic {
 		//$_sip->reply(603,'Decline');
 		$_sip->setMethod('CANCEL');
 		$_sip->setFrom('sip:'.$Username.'@'.$Host/*.':'.$Port*/);
-		$$_sip->send();
+		$_sip->send();
 		$this->checkAndUpdateCmd('CallStatus','Racrocher');
 	}
 	public function call($number) {	
@@ -203,8 +203,25 @@ class clientSIP extends eqLogic {
 		$_sip->setUri('sip:'.$number.'@'.$Host.';transport='.$this->getConfiguration("transport"));
 		$_sip->setTo('sip:'.$number.'@'.$Host);
 		$_sip->setMethod('INVITE');
-		$this->checkAndUpdateCmd('CallStatus','Appel en cours');
+		$this->checkAndUpdateCmd('CallStatus','Sonnerie');
 		$res=$_sip->send();
+		while($CallStatus->execCmd() == 'Sonnerie');
+		switch($CallStatus->execCmd()){
+			case 'Decrocher':
+				$call['status']= 'call';
+				self::addHistoryCall($call);
+				$this->Decrocher($_sip);
+				while($CallStatus->execCmd() == 'Decrocher');
+				$call['status']= 'close';
+				self::addHistoryCall($call);
+				$this->Racrocher($_sip);
+			break;
+			case 'Racrocher':
+				$call['status']= 'reject';
+				self::addHistoryCall($call);
+				$this->Racrocher($_sip);
+			return;
+		}
 	}
 	public static function addHistoryCall($_call) {
 		$cache = cache::byKey('clientSIP::HistoryCall');
