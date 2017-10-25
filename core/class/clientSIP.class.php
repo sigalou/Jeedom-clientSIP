@@ -195,7 +195,7 @@ class clientSIP extends eqLogic {
 		$Username=$this->getConfiguration("Username");
 		$Password=$this->getConfiguration("Password");
 		$this->checkAndUpdateCmd('CallStatus','Racrocher');	
-		$_sip = new sip($clientSIP->getId(),network ::getNetworkAccess('internal', 'ip', '', false));
+		$_sip = new sip($this->getId(),network ::getNetworkAccess('internal', 'ip', '', false));
 		$_sip->setUsername($Username);
 		$_sip->setPassword($Password);
 		$_sip->newCall();
@@ -205,6 +205,7 @@ class clientSIP extends eqLogic {
 		$_sip->setMethod('INVITE');
 		$this->checkAndUpdateCmd('CallStatus','Sonnerie');
 		$res=$_sip->send();
+		$CallStatus=$this->getCmd(null,'CallStatus');
 		while($CallStatus->execCmd() == 'Sonnerie');
 		switch($CallStatus->execCmd()){
 			case 'Decrocher':
