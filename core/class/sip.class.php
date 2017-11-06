@@ -676,31 +676,31 @@ class sip
     {
       $this->parseRequest();
     }
-     // $this->actionResCode();
+     $this->actionResCode();
   }
 
-  private function actionResCode(){
-    $client=eqLogic::byId($this->jeedomId);
-    if(is_object($client)){
-      switch($this->res_code){
-      case 100:
-       $client->checkAndUpdateCmd('CallStatus','Appel en cours');
-        $this->reply(100,'Trying');
-      break;
-      case 180:
-	      $client->checkAndUpdateCmd('CallStatus','Sonnerie');
-        $this->reply(180,'Ringing');
-      break;
-			case '200':
-				$client->checkAndUpdateCmd('CallStatus','Décroché');
-        $this->reply(200,'OK');
-			break;
-			case '486':
-				$client->checkAndUpdateCmd('CallStatus','Décroché');
-			break;
-      }
-    }
-  }
+	private function actionResCode(){
+		$client=eqLogic::byId($this->jeedomId);
+		if(is_object($client)){
+			switch($this->res_code){
+				case 100:
+					$client->checkAndUpdateCmd('CallStatus','Appel en cours');
+					$this->reply(100,'Trying');
+				break;
+				case 180:
+					$client->checkAndUpdateCmd('CallStatus','Sonnerie');
+					$this->reply(180,'Ringing');
+				break;
+				case '200':
+					$client->checkAndUpdateCmd('CallStatus','Décroché');
+					$this->reply(200,'OK');
+				break;
+				case '486':
+					$client->checkAndUpdateCmd('CallStatus','Décroché');
+				break;
+			}
+		}
+	}
   private function parseResponse()
   {
     // Request via
