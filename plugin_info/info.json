@@ -1,6 +1,7 @@
 {
 	"id" : "clientSIP",
 	"name" : "Client SIP",
+   	"description" : "Connecter Jeedom a votre reseau SIP",
 	"licence" : "AGPL",
 	"author" : "Halbout Michael",
 	"require" : "3.0",
