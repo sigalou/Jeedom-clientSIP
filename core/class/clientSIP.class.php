@@ -202,7 +202,7 @@ class clientSIP extends eqLogic {
 		$Port=config::byKey('Port', 'clientSIP');
 		//$_sip->reply(603,'Decline');
 		$_sip->setMethod('CANCEL');
-		$_sip->setFrom('sip:'.$Username.'@'.$Host.':'.$Port);
+		$_sip->setFrom('sip:'.$Username.'@'.$Host);
 		$_sip->send();
 		$this->checkAndUpdateCmd('CallStatus','Racrocher');
 	}
@@ -217,7 +217,7 @@ class clientSIP extends eqLogic {
 		$_sip->setUsername($Username);
 		$_sip->setPassword($Password);
 		$_sip->newCall();
-		$_sip->setFrom('sip:'.$Username.'@'.$Host.':'.$Port);
+		$_sip->setFrom('sip:'.$Username.'@'.$Host);
 		$_sip->setUri('sip:'.$number.'@'.$Host.':'.$Port.';transport='.$this->getConfiguration("transport"));
 		$_sip->setTo('sip:'.$number.'@'.$Host.':'.$Port);
 		$_sip->setMethod('INVITE');
