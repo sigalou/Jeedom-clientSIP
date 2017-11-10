@@ -2,6 +2,25 @@
 require_once dirname(__FILE__) . '/../../../../core/php/core.inc.php';
 include_file('core', 'sip', 'class', 'clientSIP');
 class clientSIP extends eqLogic {
+	public static function dependancy_info() {
+		$return = array();
+		$return['log'] = 'clientSIP';
+		$cmd = "dpkg -l | grep mplayer";
+		exec($cmd, $output, $return_var);
+		if (isset($output[0])) {
+			if (`which pico2wave`) {
+				$return['state'] = 'ok';
+			} else {
+				$return['state'] = 'nok';
+			}
+		} else {
+			$return['state'] = 'nok';
+		}
+		return $return;
+	}
+	public static function dependancy_install() {
+		passthru('/bin/bash ' . realpath(dirname(__FILE__)) . '/../../resources/install.sh ' . realpath(dirname(__FILE__)) . '/../../resources/ > ' . log::getPathToLog('clientSIP') . ' 2>&1 &');
+	}
 	public static function deamon_info() {
 		$return = array();
 		$return['log'] = 'clientSIP';
@@ -117,7 +136,7 @@ class clientSIP extends eqLogic {
 				$_sip->addHeader('Expires: '.$clientSIP->getConfiguration("Expiration"));
 				$_sip->setMethod('REGISTER');
 				//$_sip->setProxy($Host.':'.$Port);
-				$_sip->setFrom('sip:'.$Username.'@'.$Host/*.':'.$Port*/);
+				$_sip->setFrom('sip:'.$Username.'@'.$Host.':'.$Port);
 				$_sip->setUri('sip:'.$Username.'@'.$Host.';transport='.$clientSIP->getConfiguration("transport"));
 				$_sip->setServerMode(true);
 				$res = $_sip->send();
@@ -130,8 +149,6 @@ class clientSIP extends eqLogic {
 		log::add('clientSIP', 'debug', 'Objet mis à jour => ' . json_encode($_option));
 		$clientSIP = clientSIP::byId($_option['id']);
 		if (is_object($clientSIP) && $clientSIP->getIsEnable()) {
-			$Host=config::byKey('Host', 'clientSIP');
-			$Port=config::byKey('Port', 'clientSIP');
 			$Username=$clientSIP->getConfiguration("Username");
 			$Password=$clientSIP->getConfiguration("Password");
 			$_sip = new sip($clientSIP->getId(),network ::getNetworkAccess('internal', 'ip', '', false));
@@ -184,7 +201,7 @@ class clientSIP extends eqLogic {
 		$Host=config::byKey('Host', 'clientSIP');
 		//$_sip->reply(603,'Decline');
 		$_sip->setMethod('CANCEL');
-		$_sip->setFrom('sip:'.$Username.'@'.$Host/*.':'.$Port*/);
+		$_sip->setFrom('sip:'.$Username.'@'.$Host.':'.$Port);
 		$_sip->send();
 		$this->checkAndUpdateCmd('CallStatus','Racrocher');
 	}
@@ -199,7 +216,7 @@ class clientSIP extends eqLogic {
 		$_sip->setUsername($Username);
 		$_sip->setPassword($Password);
 		$_sip->newCall();
-		$_sip->setFrom('sip:'.$Username.'@'.$Host);
+		$_sip->setFrom('sip:'.$Username.'@'.$Host.':'.$Port);
 		$_sip->setUri('sip:'.$number.'@'.$Host.';transport='.$this->getConfiguration("transport"));
 		$_sip->setTo('sip:'.$number.'@'.$Host);
 		$_sip->setMethod('INVITE');
@@ -252,6 +269,68 @@ class clientSIP extends eqLogic {
 		}
 		$Commande->save();
 		return $Commande;
+	}
+	public function sendCommand( $id, $type, $option ) {
+		log::add('clientSIP', 'debug', 'Lecture : ' . $type . ' ' . $option);
+		$playtts = self::byId($id, 'clientSIP');
+		if ($type == 'tts') {
+			$hash = hash('md5', $option);
+			$file = '/tmp/' . $hash . '.mp3';
+		} else {
+			$file = $option;
+		}
+		log::add('clientSIP', 'debug', 'File : ' .  $file);
+		if ($playtts->getConfiguration('maitreesclave') == 'deporte'){
+			$ip=$playtts->getConfiguration('addressip');
+			$port=$playtts->getConfiguration('portssh');
+			$user=$playtts->getConfiguration('user');
+			$pass=$playtts->getConfiguration('password');
+			if (!$connection = ssh2_connect($ip,$port)) {
+				log::add('clientSIP', 'error', 'connexion SSH KO');
+			}else{
+				if (!ssh2_auth_password($connection,$user,$pass)){
+					log::add('clientSIP', 'error', 'Authentification SSH KO');
+				}else{
+					log::add('clientSIP', 'debug', 'Commande par SSH');
+					if ($type == 'tts') {
+						$lang = $playtts->getConfiguration('lang');
+						if ($lang == '') {
+							$lang == 'fr-FR';
+						}
+						$pico = ssh2_exec($connection,"pico2wave -l " . $lang . " -w /tmp/voice.wav \"" . $option . "\"");						
+						stream_set_blocking($pico, true);
+						$result = stream_get_contents($pico);						
+						
+						$sox = ssh2_exec($connection,"sox /tmp/voice.wav -r 48k " . $file);
+						stream_set_blocking($sox, true);
+						$result = stream_get_contents($sox);						
+					}
+					$result = ssh2_exec($connection,'mplayer ' . $playtts->getConfiguration('opt') . ' ' . $file);
+					stream_set_blocking($result, true);
+					$result = stream_get_contents($result);
+
+					$closesession = ssh2_exec($connection, 'exit');
+					stream_set_blocking($closesession, true);
+					stream_get_contents($closesession);
+				}
+			}
+		}else {
+			if (!file_exists($file)) {
+				if ($type == 'tts') {
+					$lang = $playtts->getConfiguration('lang');
+					if ($lang == '') {
+						$lang == 'fr-FR';
+					}
+					exec("pico2wave -l " . $lang . " -w /tmp/voice.wav \"" . $option . "\"");
+					exec("sox /tmp/voice.wav -r 48k " . $file);
+				} else {
+					log::add('clientSIP', 'error', 'Fichier inexistant');
+					return;
+				}
+			}
+
+			exec('mplayer ' . $playtts->getConfiguration('opt') . ' ' . $file);
+		}
 	}
 }
 class clientSIPCmd extends cmd {
