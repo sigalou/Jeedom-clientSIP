@@ -136,7 +136,7 @@ class clientSIP extends eqLogic {
 				$_sip->addHeader('Expires: '.$clientSIP->getConfiguration("Expiration"));
 				$_sip->setMethod('REGISTER');
 				//$_sip->setProxy($Host.':'.$Port);
-				$_sip->setFrom('sip:'.$Username.'@'.$Host/*.':'.$Port*/);
+				$_sip->setFrom('sip:'.$Username.'@'.$Host.':'.$Port);
 				$_sip->setUri('sip:'.$Username.'@'.$Host.';transport='.$clientSIP->getConfiguration("transport"));
 				$_sip->setServerMode(true);
 				$res = $_sip->send();
@@ -149,8 +149,6 @@ class clientSIP extends eqLogic {
 		log::add('clientSIP', 'debug', 'Objet mis à jour => ' . json_encode($_option));
 		$clientSIP = clientSIP::byId($_option['id']);
 		if (is_object($clientSIP) && $clientSIP->getIsEnable()) {
-			$Host=config::byKey('Host', 'clientSIP');
-			$Port=config::byKey('Port', 'clientSIP');
 			$Username=$clientSIP->getConfiguration("Username");
 			$Password=$clientSIP->getConfiguration("Password");
 			$_sip = new sip($clientSIP->getId(),network ::getNetworkAccess('internal', 'ip', '', false));
@@ -203,7 +201,7 @@ class clientSIP extends eqLogic {
 		$Host=config::byKey('Host', 'clientSIP');
 		//$_sip->reply(603,'Decline');
 		$_sip->setMethod('CANCEL');
-		$_sip->setFrom('sip:'.$Username.'@'.$Host/*.':'.$Port*/);
+		$_sip->setFrom('sip:'.$Username.'@'.$Host.':'.$Port);
 		$_sip->send();
 		$this->checkAndUpdateCmd('CallStatus','Racrocher');
 	}
@@ -218,7 +216,7 @@ class clientSIP extends eqLogic {
 		$_sip->setUsername($Username);
 		$_sip->setPassword($Password);
 		$_sip->newCall();
-		$_sip->setFrom('sip:'.$Username.'@'.$Host);
+		$_sip->setFrom('sip:'.$Username.'@'.$Host.':'.$Port);
 		$_sip->setUri('sip:'.$number.'@'.$Host.';transport='.$this->getConfiguration("transport"));
 		$_sip->setTo('sip:'.$number.'@'.$Host);
 		$_sip->setMethod('INVITE');
