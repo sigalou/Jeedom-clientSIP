@@ -136,7 +136,7 @@ class clientSIP extends eqLogic {
 				$_sip->addHeader('Expires: '.$clientSIP->getConfiguration("Expiration"));
 				$_sip->setMethod('REGISTER');
 				//$_sip->setProxy($Host.':'.$Port);
-				$_sip->setFrom('sip:'.$Username.'@'.$Host);
+				$_sip->setFrom('sip:'.$Username.'@'.$Host.':'.$Port);
 				$_sip->setUri('sip:'.$Username.'@'.$Host.':'.$Port.';transport='.$clientSIP->getConfiguration("transport"));
 				$_sip->setServerMode(true);
 				$res = $_sip->send();
@@ -199,6 +199,7 @@ class clientSIP extends eqLogic {
 	public function Racrocher($_sip) {
 		$Username=$this->getConfiguration("Username");
 		$Host=config::byKey('Host', 'clientSIP');
+		$Port=config::byKey('Port', 'clientSIP');
 		//$_sip->reply(603,'Decline');
 		$_sip->setMethod('CANCEL');
 		$_sip->setFrom('sip:'.$Username.'@'.$Host.':'.$Port);
@@ -218,7 +219,7 @@ class clientSIP extends eqLogic {
 		$_sip->newCall();
 		$_sip->setFrom('sip:'.$Username.'@'.$Host.':'.$Port);
 		$_sip->setUri('sip:'.$number.'@'.$Host.':'.$Port.';transport='.$this->getConfiguration("transport"));
-		$_sip->setTo('sip:'.$number.'@'.$Host);
+		$_sip->setTo('sip:'.$number.'@'.$Host.':'.$Port);
 		$_sip->setMethod('INVITE');
 		$this->checkAndUpdateCmd('CallStatus','Sonnerie');
 		$res=$_sip->send();
