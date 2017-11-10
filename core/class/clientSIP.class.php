@@ -136,8 +136,8 @@ class clientSIP extends eqLogic {
 				$_sip->addHeader('Expires: '.$clientSIP->getConfiguration("Expiration"));
 				$_sip->setMethod('REGISTER');
 				//$_sip->setProxy($Host.':'.$Port);
-				$_sip->setFrom('sip:'.$Username.'@'.$Host.':'.$Port);
-				$_sip->setUri('sip:'.$Username.'@'.$Host.';transport='.$clientSIP->getConfiguration("transport"));
+				$_sip->setFrom('sip:'.$Username.'@'.$Host);
+				$_sip->setUri('sip:'.$Username.'@'.$Host.':'.$Port.';transport='.$clientSIP->getConfiguration("transport"));
 				$_sip->setServerMode(true);
 				$res = $_sip->send();
 				$clientSIP->checkAndUpdateCmd('RegStatus','Enregistrer');	
@@ -217,7 +217,7 @@ class clientSIP extends eqLogic {
 		$_sip->setPassword($Password);
 		$_sip->newCall();
 		$_sip->setFrom('sip:'.$Username.'@'.$Host.':'.$Port);
-		$_sip->setUri('sip:'.$number.'@'.$Host.';transport='.$this->getConfiguration("transport"));
+		$_sip->setUri('sip:'.$number.'@'.$Host.':'.$Port.';transport='.$this->getConfiguration("transport"));
 		$_sip->setTo('sip:'.$number.'@'.$Host);
 		$_sip->setMethod('INVITE');
 		$this->checkAndUpdateCmd('CallStatus','Sonnerie');
