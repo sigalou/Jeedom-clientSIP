@@ -153,6 +153,17 @@ $eqLogics = eqLogic::byType('clientSIP');
 						<fieldset>
 							<div class="form-group">
 								<label class="col-md-2 control-label" >
+									{{Proxy}}
+									<sup>
+										<i class="fa fa-question-circle tooltips" title="Proxy" style="font-size : 1em;color:grey;">{{Proxy}}</i>
+									</sup>
+								</label>
+								<div class="col-md-3">
+									<input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="Proxy" placeholder="{{Proxy}}"/>
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-md-2 control-label" >
 									{{Autentification}}
 									<sup>
 										<i class="fa fa-question-circle tooltips" title="" style="font-size : 1em;color:grey;"></i>
