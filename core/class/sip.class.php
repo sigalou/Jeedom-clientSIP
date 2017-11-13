@@ -676,7 +676,7 @@ class sip
     {
       $this->parseRequest();
     }
-     $this->actionResCode();
+    // $this->actionResCode();
   }
 
 	private function actionResCode(){

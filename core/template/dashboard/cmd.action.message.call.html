@@ -82,5 +82,23 @@
 	$(".cmd[data-cmd_id=#id#] .action").on("click", function() {
 		var num = $('.numDisplay[data-cmd_id=#id#]').val();
 		jeedom.cmd.execute({id: '#id#', value: {message:num}});
+		bootbox.dialog({
+				title: "{{Appel en cours}}",
+				buttons: {
+					"Racrocher": {
+						className: "btn-danger",
+						callback: function () {
+							updateCmd('Racrocher');
+						}
+					},
+					success: {
+						label: "Décrocher",
+						className: "btn-success",
+						callback: function () {
+							updateCmd('Decrocher');
+						}
+					},
+				}
+			});
 	});
 </script>

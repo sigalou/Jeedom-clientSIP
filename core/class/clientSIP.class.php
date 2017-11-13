@@ -135,8 +135,9 @@ class clientSIP extends eqLogic {
 				$_sip->setPassword($Password);
 				$_sip->addHeader('Expires: '.$clientSIP->getConfiguration("Expiration"));
 				$_sip->setMethod('REGISTER');
-				//$_sip->setProxy($Host.':'.$Port);
-				$_sip->setFrom('sip:'.$Username.'@'.$Host);
+				if($clientSIP->getConfiguration("Proxy")=!"") 
+					$_sip->setProxy($clientSIP->getConfiguration("Proxy"));
+				$_sip->setFrom('sip:'.$Username.'@'.$Host.':'.$Port);
 				$_sip->setUri('sip:'.$Username.'@'.$Host.':'.$Port.';transport='.$clientSIP->getConfiguration("transport"));
 				$_sip->setServerMode(true);
 				$res = $_sip->send();
@@ -152,6 +153,8 @@ class clientSIP extends eqLogic {
 			$Username=$clientSIP->getConfiguration("Username");
 			$Password=$clientSIP->getConfiguration("Password");
 			$_sip = new sip($clientSIP->getId(),network ::getNetworkAccess('internal', 'ip', '', false));
+			if($clientSIP->getConfiguration("Proxy")=!"") 
+				$_sip->setProxy($clientSIP->getConfiguration("Proxy"));
 			while(true){
 				$_sip->setUsername($Username);
 				$_sip->setPassword($Password);
@@ -199,9 +202,10 @@ class clientSIP extends eqLogic {
 	public function Racrocher($_sip) {
 		$Username=$this->getConfiguration("Username");
 		$Host=config::byKey('Host', 'clientSIP');
+		$Port=config::byKey('Port', 'clientSIP');
 		//$_sip->reply(603,'Decline');
 		$_sip->setMethod('CANCEL');
-		$_sip->setFrom('sip:'.$Username.'@'.$Host.':'.$Port);
+		$_sip->setFrom('sip:'.$Username.'@'.$Host);
 		$_sip->send();
 		$this->checkAndUpdateCmd('CallStatus','Racrocher');
 	}
@@ -213,12 +217,14 @@ class clientSIP extends eqLogic {
 		$Password=$this->getConfiguration("Password");
 		$this->checkAndUpdateCmd('CallStatus','Racrocher');	
 		$_sip = new sip($this->getId(),network ::getNetworkAccess('internal', 'ip', '', false));
+		if($this->getConfiguration("Proxy")=!"") 
+			$_sip->setProxy($this->getConfiguration("Proxy"));
 		$_sip->setUsername($Username);
 		$_sip->setPassword($Password);
 		$_sip->newCall();
-		$_sip->setFrom('sip:'.$Username.'@'.$Host.':'.$Port);
+		$_sip->setFrom('sip:'.$Username.'@'.$Host);
 		$_sip->setUri('sip:'.$number.'@'.$Host.':'.$Port.';transport='.$this->getConfiguration("transport"));
-		$_sip->setTo('sip:'.$number.'@'.$Host);
+		$_sip->setTo('sip:'.$number.'@'.$Host.':'.$Port);
 		$_sip->setMethod('INVITE');
 		$this->checkAndUpdateCmd('CallStatus','Sonnerie');
 		$res=$_sip->send();
