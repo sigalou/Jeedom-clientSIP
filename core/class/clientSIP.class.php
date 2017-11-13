@@ -135,7 +135,7 @@ class clientSIP extends eqLogic {
 				$_sip->setPassword($Password);
 				$_sip->addHeader('Expires: '.$clientSIP->getConfiguration("Expiration"));
 				$_sip->setMethod('REGISTER');
-				if($clientSIP->getConfiguration("Proxy")=!"") 
+				if($clientSIP->getConfiguration("Proxy")!="") 
 					$_sip->setProxy($clientSIP->getConfiguration("Proxy"));
 				$_sip->setFrom('sip:'.$Username.'@'.$Host.':'.$Port);
 				$_sip->setUri('sip:'.$Username.'@'.$Host.':'.$Port.';transport='.$clientSIP->getConfiguration("transport"));
@@ -153,7 +153,7 @@ class clientSIP extends eqLogic {
 			$Username=$clientSIP->getConfiguration("Username");
 			$Password=$clientSIP->getConfiguration("Password");
 			$_sip = new sip($clientSIP->getId(),network ::getNetworkAccess('internal', 'ip', '', false));
-			if($clientSIP->getConfiguration("Proxy")=!"") 
+			if($clientSIP->getConfiguration("Proxy")!="") 
 				$_sip->setProxy($clientSIP->getConfiguration("Proxy"));
 			while(true){
 				$_sip->setUsername($Username);
@@ -217,7 +217,7 @@ class clientSIP extends eqLogic {
 		$Password=$this->getConfiguration("Password");
 		$this->checkAndUpdateCmd('CallStatus','Racrocher');	
 		$_sip = new sip($this->getId(),network ::getNetworkAccess('internal', 'ip', '', false));
-		if($this->getConfiguration("Proxy")=!"") 
+		if($this->getConfiguration("Proxy")!="") 
 			$_sip->setProxy($this->getConfiguration("Proxy"));
 		$_sip->setUsername($Username);
 		$_sip->setPassword($Password);
