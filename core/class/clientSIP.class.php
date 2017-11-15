@@ -203,9 +203,8 @@ class clientSIP extends eqLogic {
 		$Username=$this->getConfiguration("Username");
 		$Host=config::byKey('Host', 'clientSIP');
 		$Port=config::byKey('Port', 'clientSIP');
-		
 		$CallStatus=$this->getCmd(null,'CallStatus');
-		if($CallStatus->execCmd() == 'Sonnerie'){{
+		if($CallStatus->execCmd() == 'Sonnerie'){
 			$_sip->reply(487,'Request Terminated');
 			$_sip->reply(603,'Decline');
 		}else{
