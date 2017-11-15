@@ -132,14 +132,14 @@ class clientSIP extends eqLogic {
 			$clientSIP->CreateConnexion();
 			//while(true){
 				$clientSIP->checkAndUpdateCmd('RegStatus','Inactif');
-				$clientSIP->_sip->setUsername($this->_Username);
-				$clientSIP->_sip->setPassword($this->_Password);
+				$clientSIP->_sip->setUsername($clientSIP->_Username);
+				$clientSIP->_sip->setPassword($clientSIP->_Password);
 				$clientSIP->_sip->addHeader('Expires: '.$clientSIP->getConfiguration("Expiration"));
 				$clientSIP->_sip->setMethod('REGISTER');
 				if($clientSIP->getConfiguration("Proxy")!="") 
 					$clientSIP->_sip->setProxy($clientSIP->getConfiguration("Proxy"));
-				$clientSIP->_sip->setFrom('sip:'.$this->_Username.'@'.$this->_Host.':'.$this->_Port);
-				$clientSIP->_sip->setUri('sip:'.$this->_Username.'@'.$this->_Host.':'.$this->_Port.';transport='.$clientSIP->getConfiguration("transport"));
+				$clientSIP->_sip->setFrom('sip:'.$clientSIP->_Username.'@'.$clientSIP->_Host.':'.$clientSIP->_Port);
+				$clientSIP->_sip->setUri('sip:'.$clientSIP->_Username.'@'.$clientSIP->_Host.':'.$clientSIP->_Port.';transport='.$clientSIP->getConfiguration("transport"));
 				$clientSIP->_sip->setServerMode(true);
 				$res = $clientSIP->_sip->send();
 				$clientSIP->checkAndUpdateCmd('RegStatus','Enregistrer');	
