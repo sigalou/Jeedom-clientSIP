@@ -203,10 +203,17 @@ class clientSIP extends eqLogic {
 		$Username=$this->getConfiguration("Username");
 		$Host=config::byKey('Host', 'clientSIP');
 		$Port=config::byKey('Port', 'clientSIP');
-		//$_sip->reply(603,'Decline');
-		$_sip->setMethod('CANCEL');
-		$_sip->setFrom('sip:'.$Username.'@'.$Host);
-		$_sip->send();
+		
+		$CallStatus=$this->getCmd(null,'CallStatus');
+		if($CallStatus->execCmd() == 'Sonnerie'){{
+			$_sip->reply(487,'Request Terminated');
+			$_sip->reply(603,'Decline');
+		}else{
+			//$_sip->reply(603,'Decline');
+			$_sip->setMethod('CANCEL');
+			$_sip->setFrom('sip:'.$Username.'@'.$Host);
+			$_sip->send();
+		}
 		$this->checkAndUpdateCmd('CallStatus','Racrocher');
 	}
 	public function call($number) {	
