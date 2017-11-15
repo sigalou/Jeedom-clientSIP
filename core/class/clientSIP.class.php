@@ -2,6 +2,11 @@
 require_once dirname(__FILE__) . '/../../../../core/php/core.inc.php';
 include_file('core', 'sip', 'class', 'clientSIP');
 class clientSIP extends eqLogic {
+  	protected $_sip = null;
+	protected $_Host=null;
+	protected $_Port=null;
+	protected $_Username= null;
+	protected $_Password= null;
 	public static function dependancy_info() {
 		$return = array();
 		$return['log'] = 'clientSIP';
@@ -124,23 +129,19 @@ class clientSIP extends eqLogic {
 		log::add('clientSIP', 'debug', 'Objet mis à jour => ' . json_encode($_option));
 		$clientSIP = clientSIP::byId($_option['id']);
 		if (is_object($clientSIP) && $clientSIP->getIsEnable()) {
-			$Host=config::byKey('Host', 'clientSIP');
-			$Port=config::byKey('Port', 'clientSIP');
-			$Username=$clientSIP->getConfiguration("Username");
-			$Password=$clientSIP->getConfiguration("Password");
-			$_sip = new sip($clientSIP->getId(),network ::getNetworkAccess('internal', 'ip', '', false));
+			$clientSIP->CreateConnexion();
 			//while(true){
 				$clientSIP->checkAndUpdateCmd('RegStatus','Inactif');
-				$_sip->setUsername($Username);
-				$_sip->setPassword($Password);
-				$_sip->addHeader('Expires: '.$clientSIP->getConfiguration("Expiration"));
-				$_sip->setMethod('REGISTER');
+				$clientSIP->_sip->setUsername($this->_Username);
+				$clientSIP->_sip->setPassword($this->_Password);
+				$clientSIP->_sip->addHeader('Expires: '.$clientSIP->getConfiguration("Expiration"));
+				$clientSIP->_sip->setMethod('REGISTER');
 				if($clientSIP->getConfiguration("Proxy")!="") 
-					$_sip->setProxy($clientSIP->getConfiguration("Proxy"));
-				$_sip->setFrom('sip:'.$Username.'@'.$Host.':'.$Port);
-				$_sip->setUri('sip:'.$Username.'@'.$Host.':'.$Port.';transport='.$clientSIP->getConfiguration("transport"));
-				$_sip->setServerMode(true);
-				$res = $_sip->send();
+					$clientSIP->_sip->setProxy($clientSIP->getConfiguration("Proxy"));
+				$clientSIP->_sip->setFrom('sip:'.$this->_Username.'@'.$this->_Host.':'.$this->_Port);
+				$clientSIP->_sip->setUri('sip:'.$this->_Username.'@'.$this->_Host.':'.$this->_Port.';transport='.$clientSIP->getConfiguration("transport"));
+				$clientSIP->_sip->setServerMode(true);
+				$res = $clientSIP->_sip->send();
 				$clientSIP->checkAndUpdateCmd('RegStatus','Enregistrer');	
 				//sleep($clientSIP->getConfiguration("Expiration"));
 			//}
@@ -150,28 +151,35 @@ class clientSIP extends eqLogic {
 		log::add('clientSIP', 'debug', 'Objet mis à jour => ' . json_encode($_option));
 		$clientSIP = clientSIP::byId($_option['id']);
 		if (is_object($clientSIP) && $clientSIP->getIsEnable()) {
-			$Username=$clientSIP->getConfiguration("Username");
-			$Password=$clientSIP->getConfiguration("Password");
-			$_sip = new sip($clientSIP->getId(),network ::getNetworkAccess('internal', 'ip', '', false));
-			if($clientSIP->getConfiguration("Proxy")!="") 
-				$_sip->setProxy($clientSIP->getConfiguration("Proxy"));
+			$clientSIP->CreateConnexion();
 			while(true){
-				$_sip->setUsername($Username);
-				$_sip->setPassword($Password);
-				$_sip->newCall();
-				$_sip->listen('INVITE');
-				$clientSIP->RepondreAppel($_sip);
+				$clientSIP->_sip->newCall();
+				$clientSIP->_sip->listen('INVITE');
+				$clientSIP->RepondreAppel();
 			}
 		}
 	}	
-	public function RepondreAppel($_sip) {
+	private function CreateConnexion(){
+		$this->_Host=config::byKey('Host', 'clientSIP');
+		$this->_Port=config::byKey('Port', 'clientSIP');
+		$this->_Username=$this->getConfiguration("Username");
+		$this->_Password=$this->getConfiguration("Password");
+		if($this->_sip == null){
+			$this->_sip = new sip($this->getId(),network ::getNetworkAccess('internal', 'ip', '', false));
+			if($this->getConfiguration("Proxy")!="") 
+				$this->_sip->setProxy($this->getConfiguration("Proxy"));
+			$this->_sip->setUsername($this->_Username);
+			$this->_sip->setPassword($this->_Password);
+		}
+	}
+	public function RepondreAppel() {
 		$call['status']='ringing'; 
 		$call['flow']='incoming';  
 		$call['number']='';  
 		$call['start']=date('d/m/Y H:i:s');  
 		self::addHistoryCall($call);
-		//$_sip->reply(100,'Trying');
-		$_sip->reply(180,'Ringing');
+		//$this->_sip->reply(100,'Trying');
+		$this->_sip->reply(180,'Ringing');
 		$this->checkAndUpdateCmd('CallStatus','Sonnerie');
 		event::add('clientSIP::call', utils::o2a($this));
 		$CallStatus=$this->getCmd(null,'CallStatus');
@@ -181,75 +189,65 @@ class clientSIP extends eqLogic {
 		switch($CallStatus->execCmd()){
 			case 'Decrocher':
 				$call['status']= 'call';
-				$this->Decrocher($_sip);
+				$this->Decrocher();
 			break;
 			case 'Racrocher':
 				$call['status']= 'reject';
-				$this->Racrocher($_sip);
+				$this->Racrocher();
 			return;
 		}
 		self::addHistoryCall($call);
 	}
-	public function Decrocher($_sip='') {
+	public function Decrocher() {
 		//ajouter les options de compatibilité de jeedom
-		$_sip->reply(200,'Ok');
-		event::add('clientSIP::rtsp', $_sip->rtsp());
+		$this->_sip->reply(200,'Ok');
+		event::add('clientSIP::rtsp', $this->_sip->rtsp());
 		$this->checkAndUpdateCmd('CallStatus','Décrocher');
 		while($CallStatus->execCmd() == 'Decrocher')
 			sleep(5);
 		$this->Racrocher();
 	}
-	public function Racrocher($_sip) {
-		$Username=$this->getConfiguration("Username");
-		$Host=config::byKey('Host', 'clientSIP');
-		$Port=config::byKey('Port', 'clientSIP');
+	public function Racrocher() {
 		$CallStatus=$this->getCmd(null,'CallStatus');
 		if($CallStatus->execCmd() == 'Sonnerie'){
-			$_sip->reply(487,'Request Terminated');
-			$_sip->reply(603,'Decline');
+			$this->_sip->reply(487,'Request Terminated');
+			$this->_sip->reply(603,'Decline');
 		}else{
-			//$_sip->reply(603,'Decline');
-			$_sip->setMethod('CANCEL');
-			$_sip->setFrom('sip:'.$Username.'@'.$Host);
-			$_sip->send();
+			$this->_sip->setMethod('CANCEL');
+			$this->_sip->setFrom('sip:'.$this->_Username.'@'.$this->_Host);
+			$this->_sip->send();
 		}
 		$this->checkAndUpdateCmd('CallStatus','Racrocher');
 	}
 	public function call($number) {	
 		log::add('clientSIP', 'debug', 'Appel en demandé => ' . $number);
-		$Host=config::byKey('Host', 'clientSIP');
-		$Port=config::byKey('Port', 'clientSIP');
-		$Username=$this->getConfiguration("Username");
-		$Password=$this->getConfiguration("Password");
 		$this->checkAndUpdateCmd('CallStatus','Racrocher');	
-		$_sip = new sip($this->getId(),network ::getNetworkAccess('internal', 'ip', '', false));
-		if($this->getConfiguration("Proxy")!="") 
-			$_sip->setProxy($this->getConfiguration("Proxy"));
-		$_sip->setUsername($Username);
-		$_sip->setPassword($Password);
-		$_sip->newCall();
-		$_sip->setFrom('sip:'.$Username.'@'.$Host);
-		$_sip->setUri('sip:'.$number.'@'.$Host.':'.$Port.';transport='.$this->getConfiguration("transport"));
-		$_sip->setTo('sip:'.$number.'@'.$Host.':'.$Port);
-		$_sip->setMethod('INVITE');
+		$this->CreateConnexion();
+		$this->_sip->setUsername($this->_Username);
+		$this->_sip->setPassword($this->_Password);
+		$this->_sip->newCall();
+		$this->_sip->setFrom('sip:'.$this->_Username.'@'.$this->_Host);
+		$this->_sip->setUri('sip:'.$number.'@'.$this->_Host.':'.$this->_Port.';transport='.$this->getConfiguration("transport"));
+		$this->_sip->setTo('sip:'.$number.'@'.$this->_Host.':'.$this->_Port);
+		$this->_sip->setMethod('INVITE');
 		$this->checkAndUpdateCmd('CallStatus','Sonnerie');
-		$res=$_sip->send();
+		$res=$this->_sip->send();
 		$CallStatus=$this->getCmd(null,'CallStatus');
 		while($CallStatus->execCmd() == 'Sonnerie');
 		switch($CallStatus->execCmd()){
 			case 'Decrocher':
 				$call['status']= 'call';
 				self::addHistoryCall($call);
-				$this->Decrocher($_sip);
+				$this->Decrocher();
 				while($CallStatus->execCmd() == 'Decrocher');
 				$call['status']= 'close';
 				self::addHistoryCall($call);
-				$this->Racrocher($_sip);
+				$this->Racrocher();
 			break;
 			case 'Racrocher':
 				$call['status']= 'reject';
 				self::addHistoryCall($call);
-				$this->Racrocher($_sip);
+				$this->Racrocher();
 			return;
 		}
 	}
@@ -294,10 +292,10 @@ class clientSIP extends eqLogic {
 		log::add('clientSIP', 'debug', 'File : ' .  $file);
 		if ($playtts->getConfiguration('maitreesclave') == 'deporte'){
 			$ip=$playtts->getConfiguration('addressip');
-			$port=$playtts->getConfiguration('portssh');
+			$this->_Port=$playtts->getConfiguration('portssh');
 			$user=$playtts->getConfiguration('user');
 			$pass=$playtts->getConfiguration('password');
-			if (!$connection = ssh2_connect($ip,$port)) {
+			if (!$connection = ssh2_connect($ip,$this->_Port)) {
 				log::add('clientSIP', 'error', 'connexion SSH KO');
 			}else{
 				if (!ssh2_auth_password($connection,$user,$pass)){
