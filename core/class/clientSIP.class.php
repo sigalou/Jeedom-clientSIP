@@ -52,6 +52,8 @@ class clientSIP extends eqLogic {
 			return;
 		if ($deamon_info['state'] == 'ok') 
 			return;
+		$cache = cache::byKey('clientSIP::HistoryCall');
+		$cache->remove();
 		foreach(eqLogic::byType('clientSIP') as $clientSIP){
 			if($clientSIP->getIsEnable()){
 				$clientSIP->CreateDemon();   
