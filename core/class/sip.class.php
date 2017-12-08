@@ -669,6 +669,7 @@ class sip
     {
       $this->res_code = trim($m[1]);
       
+     $this->actionResCode();
       $this->parseResponse();
     }
     // Request
@@ -676,7 +677,6 @@ class sip
     {
       $this->parseRequest();
     }
-     $this->actionResCode();
   }
 
 	private function actionResCode(){
@@ -691,10 +691,10 @@ class sip
 					$client->checkAndUpdateCmd('CallStatus','Sonnerie');
 					$this->reply(180,'Ringing');
 				break;
-				/*case '200':
+				case '200':
 					$client->checkAndUpdateCmd('CallStatus','Décroché');
 					$this->reply(200,'OK');
-				break;*/
+				break;
 				case '486':
 					$client->checkAndUpdateCmd('CallStatus','Décroché');
 				break;
