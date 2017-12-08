@@ -235,13 +235,17 @@ class clientSIP extends eqLogic {
 		$this->checkAndUpdateCmd('CallStatus','Sonnerie');
 		$res=$this->_sip->send();
 		$CallStatus=$this->getCmd(null,'CallStatus');
-		while($CallStatus->execCmd() == 'Sonnerie');
+		while($CallStatus->execCmd() == 'Sonnerie'){
+			$this->actionResCode();
+		}
 		switch($CallStatus->execCmd()){
 			case 'Decrocher':
 				$call['status']= 'call';
 				self::addHistoryCall($call);
 				$this->Decrocher();
-				while($CallStatus->execCmd() == 'Decrocher');
+				while($CallStatus->execCmd() == 'Decrocher'){
+					$this->actionResCode();
+				}
 				$call['status']= 'close';
 				self::addHistoryCall($call);
 				$this->Racrocher();
@@ -261,6 +265,25 @@ class clientSIP extends eqLogic {
 		else
 			$value[] = $_call;
 		cache::set('clientSIP::HistoryCall', json_encode(array_slice($value, -250, 250)), 0);
+	}
+	private function actionResCode(){
+		switch($this->_sip->getResCode()){
+			case 100:
+				$this->checkAndUpdateCmd('CallStatus','Appel en cours');
+				$this->_sip->reply(100,'Trying');
+			break;
+			case 180:
+				$this->checkAndUpdateCmd('CallStatus','Sonnerie');
+				$this->_sip->reply(180,'Ringing');
+			break;
+			case '200':
+				$this->checkAndUpdateCmd('CallStatus','Décroché');
+				$this->_sip->reply(200,'OK');
+			break;
+			case '486':
+				$this->checkAndUpdateCmd('CallStatus','Décroché');
+			break;
+		}
 	}
 	public function AddCommande($Name,$_logicalId,$Type="info", $SubType='string',$Template='') {
 		$Commande = $this->getCmd(null,$_logicalId);
