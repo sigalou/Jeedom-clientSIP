@@ -144,7 +144,10 @@ class clientSIP extends eqLogic {
 				$clientSIP->_sip->setUri('sip:'.$clientSIP->_Username.'@'.$clientSIP->_Host.':'.$clientSIP->_Port.';transport='.$clientSIP->getConfiguration("transport"));
 				$clientSIP->_sip->setServerMode(true);
 				$res = $clientSIP->_sip->send();
-				$clientSIP->checkAndUpdateCmd('RegStatus','Enregistrer');	
+				if ($res == '200')
+					$clientSIP->checkAndUpdateCmd('RegStatus','OK');
+				else
+					$clientSIP->checkAndUpdateCmd('RegStatus','Echec');	
 				//sleep($clientSIP->getConfiguration("Expiration"));
 			//}
 		}
@@ -153,8 +156,9 @@ class clientSIP extends eqLogic {
 		log::add('clientSIP', 'debug', 'Objet mis à jour => ' . json_encode($_option));
 		$clientSIP = clientSIP::byId($_option['id']);
 		if (is_object($clientSIP) && $clientSIP->getIsEnable()) {
-			$clientSIP->CreateConnexion();
 			while(true){
+				if(!is_object($clientSIP->_sip))
+					$clientSIP->CreateConnexion();
 				$clientSIP->_sip->newCall();
 				$clientSIP->_sip->listen('INVITE');
 				$clientSIP->RepondreAppel();
