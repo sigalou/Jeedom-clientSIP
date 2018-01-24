@@ -144,7 +144,10 @@ class clientSIP extends eqLogic {
 				$clientSIP->_sip->setUri('sip:'.$clientSIP->_Username.'@'.$clientSIP->_Host.':'.$clientSIP->_Port.';transport='.$clientSIP->getConfiguration("transport"));
 				$clientSIP->_sip->setServerMode(true);
 				$res = $clientSIP->_sip->send();
-				$clientSIP->checkAndUpdateCmd('RegStatus','Enregistrer');	
+				if ($res == '200')
+					$clientSIP->checkAndUpdateCmd('RegStatus','OK');
+				else
+					$clientSIP->checkAndUpdateCmd('RegStatus','Echec');	
 				//sleep($clientSIP->getConfiguration("Expiration"));
 			//}
 		}
@@ -153,8 +156,9 @@ class clientSIP extends eqLogic {
 		log::add('clientSIP', 'debug', 'Objet mis à jour => ' . json_encode($_option));
 		$clientSIP = clientSIP::byId($_option['id']);
 		if (is_object($clientSIP) && $clientSIP->getIsEnable()) {
-			$clientSIP->CreateConnexion();
 			while(true){
+				if(!is_object($clientSIP->_sip))
+					$clientSIP->CreateConnexion();
 				$clientSIP->_sip->newCall();
 				$clientSIP->_sip->listen('INVITE');
 				$clientSIP->RepondreAppel();
@@ -167,7 +171,7 @@ class clientSIP extends eqLogic {
 		$this->_Username=$this->getConfiguration("Username");
 		$this->_Password=$this->getConfiguration("Password");
 		if($this->_sip == null){
-			$this->_sip = new sip($this->getId(),network ::getNetworkAccess('internal', 'ip', '', false));
+			$this->_sip = new sip(network ::getNetworkAccess('internal', 'ip', '', false));
 			if($this->getConfiguration("Proxy")!="") 
 				$this->_sip->setProxy($this->getConfiguration("Proxy"));
 			$this->_sip->setUsername($this->_Username);
@@ -235,13 +239,17 @@ class clientSIP extends eqLogic {
 		$this->checkAndUpdateCmd('CallStatus','Sonnerie');
 		$res=$this->_sip->send();
 		$CallStatus=$this->getCmd(null,'CallStatus');
-		while($CallStatus->execCmd() == 'Sonnerie');
+		while($CallStatus->execCmd() == 'Sonnerie'){
+			$this->actionResCode();
+		}
 		switch($CallStatus->execCmd()){
 			case 'Decrocher':
 				$call['status']= 'call';
 				self::addHistoryCall($call);
 				$this->Decrocher();
-				while($CallStatus->execCmd() == 'Decrocher');
+				while($CallStatus->execCmd() == 'Decrocher'){
+					$this->actionResCode();
+				}
 				$call['status']= 'close';
 				self::addHistoryCall($call);
 				$this->Racrocher();
@@ -261,6 +269,25 @@ class clientSIP extends eqLogic {
 		else
 			$value[] = $_call;
 		cache::set('clientSIP::HistoryCall', json_encode(array_slice($value, -250, 250)), 0);
+	}
+	private function actionResCode(){
+		switch($this->_sip->getResCode()){
+			case 100:
+				$this->checkAndUpdateCmd('CallStatus','Appel en cours');
+				$this->_sip->reply(100,'Trying');
+			break;
+			case 180:
+				$this->checkAndUpdateCmd('CallStatus','Sonnerie');
+				$this->_sip->reply(180,'Ringing');
+			break;
+			case '200':
+				$this->checkAndUpdateCmd('CallStatus','Décroché');
+				$this->_sip->reply(200,'OK');
+			break;
+			case '486':
+				$this->checkAndUpdateCmd('CallStatus','Décroché');
+			break;
+		}
 	}
 	public function AddCommande($Name,$_logicalId,$Type="info", $SubType='string',$Template='') {
 		$Commande = $this->getCmd(null,$_logicalId);

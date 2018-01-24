@@ -4,7 +4,7 @@
 
 Ce plugin a pour but de conneter jeedom a notre reseau Sip
 
-== Installation et configuration
+== Installation und Konfiguration
 
 Pour utiliser se plugin, il est impératif d'avoir configurer un serveur sip et d'y saisir les informations de connexions
 
