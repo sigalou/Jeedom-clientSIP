@@ -6,5 +6,5 @@
    <param name="AutoLoop" value="False" />
    <param name="AutoPlay" value="True" />
    <embed id="vlcEmb"  type="application/x-google-vlc-plugin" version="VideoLAN.VLCPlugin.2" autoplay="yes" loop="no" width="640" height="480"
-     target="rtsp://cameraipaddress" ></embed>
+     target="<?php echo $_REQUEST['rtp']; ?>" ></embed>
 </OBJECT>
