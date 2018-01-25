@@ -169,7 +169,7 @@ class clientSIP extends eqLogic {
 				$clientSIP->_sip->newCall();
 				$clientSIP->_sip->listen('MESSAGE');
 				if ($res == '200')
-					event::add('clientSIP::message', $clientSIP->_sip->getMessage());
+					event::add('clientSIP::message', $clientSIP->_sip->getBody());
 			}
 		}
 	}	
@@ -215,7 +215,7 @@ class clientSIP extends eqLogic {
 	public function Decrocher() {
 		//ajouter les options de compatibilité de jeedom
 		$this->_sip->reply(200,'Ok');
-		event::add('clientSIP::rtsp', $this->_sip->rtsp());
+		event::add('clientSIP::rtsp', $this->_sip->getBody());
 		$this->checkAndUpdateCmd('CallStatus','Décrocher');
 		while($CallStatus->execCmd() == 'Decrocher')
 			sleep(5);
@@ -279,7 +279,7 @@ class clientSIP extends eqLogic {
 		$this->_sip->setFrom('sip:'.$this->_Username.'@'.$this->_Host);
 		$this->_sip->setUri('sip:'.$number.'@'.$this->_Host.':'.$this->_Port.';transport='.$this->getConfiguration("transport"));
 		$this->_sip->setTo('sip:'.$number.'@'.$this->_Host.':'.$this->_Port);
-		$this->_sip->setMessage($message);
+		$this->_sip->setBody($message);
 		$this->_sip->setMethod('MESSAGE');
 		$res=$this->_sip->send();
 		if ($res == '200')
