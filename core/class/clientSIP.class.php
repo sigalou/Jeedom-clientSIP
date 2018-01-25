@@ -45,6 +45,7 @@ class clientSIP extends eqLogic {
 		return $return;
 	}
 	public static function deamon_start($_debug = false) {
+		unlink("/var/www/html/tmp/PhpSIP.lock");
 		log::remove('clientSIP');
 		self::deamon_stop();
 		$deamon_info = self::deamon_info();
