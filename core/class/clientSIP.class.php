@@ -39,6 +39,9 @@ class clientSIP extends eqLogic {
 				$cron = cron::byClassAndFunction('clientSIP', 'WaitCall', array('id' => $clientSIP->getId()));
 				if (!is_object($cron)) 	
 					return $return;
+				$cron = cron::byClassAndFunction('clientSIP', 'WaitMessage', array('id' => $clientSIP->getId()));
+				if (!is_object($cron)) 	
+					return $return;
 			}
 		}
 		$return['state'] = 'ok';
@@ -57,7 +60,10 @@ class clientSIP extends eqLogic {
 		$cache->remove();
 		foreach(eqLogic::byType('clientSIP') as $clientSIP){
 			if($clientSIP->getIsEnable()){
-				$clientSIP->CreateDemon();   
+				$minute=round($clientSIP->getConfiguration("Expiration")/60,0);
+				$clientSIP->CreateDemon('ConnectSip','*/'.$minute.' * * * *');   
+				$clientSIP->CreateDemon('WaitCall','* * * * * *');   
+				$clientSIP->CreateDemon('WaitMessage','* * * * * *');   
 			}
 		}
 	}
@@ -69,6 +75,9 @@ class clientSIP extends eqLogic {
 			if (is_object($cron)) 	
 				$cron->remove();
 			$cron = cron::byClassAndFunction('clientSIP', 'WaitCall', array('id' => $clientSIP->getId()));
+			if (is_object($cron)) 	
+				$cron->remove();
+			$cron = cron::byClassAndFunction('clientSIP', 'WaitMessage', array('id' => $clientSIP->getId()));
 			if (is_object($cron)) 	
 				$cron->remove();
 		}
@@ -92,6 +101,7 @@ class clientSIP extends eqLogic {
 		$this->AddCommande('Etat connexion','RegStatus','info', 'string');
 		$this->AddCommande('Etat appel','CallStatus','info', 'string','CallStatus');
 		$this->AddCommande('Appel','call','action','message','call');
+		$this->AddCommande('Message','message','action','message','call');
 		$this->checkAndUpdateCmd('RegStatus','Inactif');
 	}
 	public static $_widgetPossibility = array('custom' => array(
@@ -99,30 +109,15 @@ class clientSIP extends eqLogic {
 	        'displayName' => true,
 	        'optionalParameters' => true,
 	));
-	public function CreateDemon() {
-		$cron =cron::byClassAndFunction('clientSIP', 'ConnectSip', array('id' => $this->getId()));
+	public function CreateDemon($Name,$Schedule) {
+		$cron =cron::byClassAndFunction('clientSIP', $Name, array('id' => $this->getId()));
 		if (!is_object($cron)) {
 			$cron = new cron();
 			$cron->setClass('clientSIP');
-			$cron->setFunction('ConnectSip');
+			$cron->setFunction($Name);
 			$cron->setOption(array('id' => $this->getId()));
 			$cron->setEnable(1);
-			$minute=round($this->getConfiguration("Expiration")/60,0);
-			$cron->setSchedule('*/'.$minute.' * * * *');
-			$cron->save();
-		}
-		$cron->start();
-		$cron->run();
-		$cron =cron::byClassAndFunction('clientSIP', 'WaitCall', array('id' => $this->getId()));
-		if (!is_object($cron)) {
-			$cron = new cron();
-			$cron->setClass('clientSIP');
-			$cron->setFunction('WaitCall');
-			$cron->setOption(array('id' => $this->getId()));
-			$cron->setEnable(1);
-			$cron->setDeamon(1);
-			$cron->setSchedule('* * * * *');
-			$cron->setTimeout($minute);
+			$cron->setSchedule($Schedule);
 			$cron->save();
 		}
 		$cron->start();
@@ -154,7 +149,6 @@ class clientSIP extends eqLogic {
 		}
 	}
 	public static function WaitCall($_option){
-		log::add('clientSIP', 'debug', 'Objet mis à jour => ' . json_encode($_option));
 		$clientSIP = clientSIP::byId($_option['id']);
 		if (is_object($clientSIP) && $clientSIP->getIsEnable()) {
 			while(true){
@@ -163,6 +157,19 @@ class clientSIP extends eqLogic {
 				$clientSIP->_sip->newCall();
 				$clientSIP->_sip->listen('INVITE');
 				$clientSIP->RepondreAppel();
+			}
+		}
+	}	
+	public static function WaitMessage($_option){
+		$clientSIP = clientSIP::byId($_option['id']);
+		if (is_object($clientSIP) && $clientSIP->getIsEnable()) {
+			while(true){
+				if(!is_object($clientSIP->_sip))
+					$clientSIP->CreateConnexion();
+				$clientSIP->_sip->newCall();
+				$clientSIP->_sip->listen('MESSAGE');
+				if ($res == '200')
+					event::add('clientSIP::message', $clientSIP->_sip->getMessage());
 			}
 		}
 	}	
@@ -261,6 +268,23 @@ class clientSIP extends eqLogic {
 				$this->Racrocher();
 			return;
 		}
+	}
+	public function sendMessage($number,$message) {	
+		log::add('clientSIP', 'debug', 'Appel en demandé => ' . $number);
+		$this->checkAndUpdateCmd('CallStatus','Racrocher');	
+		$this->CreateConnexion();
+		$this->_sip->setUsername($this->_Username);
+		$this->_sip->setPassword($this->_Password);
+		$this->_sip->newCall();
+		$this->_sip->setFrom('sip:'.$this->_Username.'@'.$this->_Host);
+		$this->_sip->setUri('sip:'.$number.'@'.$this->_Host.':'.$this->_Port.';transport='.$this->getConfiguration("transport"));
+		$this->_sip->setTo('sip:'.$number.'@'.$this->_Host.':'.$this->_Port);
+		$this->_sip->setMessage($message);
+		$this->_sip->setMethod('MESSAGE');
+		$res=$this->_sip->send();
+		if ($res == '200')
+			event::add('clientSIP::message', 'Le message a bien été transmis');
+		
 	}
 	public static function addHistoryCall($_call) {
 		$cache = cache::byKey('clientSIP::HistoryCall');
@@ -378,6 +402,9 @@ class clientSIPCmd extends cmd {
 		switch($this->getLogicalId()){
 			case 'call':				
 				$this->getEqLogic()->call($_options['message']);
+			break;
+			case 'message':				
+				$this->getEqLogic()->sendMessage($_options['title'],$_options['message']);
 			break;
 		}
 	}
