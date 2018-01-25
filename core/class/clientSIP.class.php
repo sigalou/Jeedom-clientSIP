@@ -169,7 +169,8 @@ class clientSIP extends eqLogic {
 				$clientSIP->_sip->newCall();
 				$clientSIP->_sip->listen('MESSAGE');
 				if ($res == '200')
-					event::add('clientSIP::message', $clientSIP->_sip->getBody());
+					message::add('sucess', $clientSIP->_sip->getBody());
+					//event::add('clientSIP::message', $clientSIP->_sip->getBody());
 			}
 		}
 	}	
