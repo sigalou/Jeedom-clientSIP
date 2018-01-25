@@ -47,7 +47,6 @@ class sip
   private $req_from_tag;
   private $req_to;
   private $req_to_tag;
-  private $rtsp;
   private $auth;
   private $routes = array();
   private $record_route = array();
@@ -450,10 +449,6 @@ class sip
       }
     }
   }
-  public function rtsp()
-  {
-    return $this->rtsp;
-  }
   public function setUsername($username)
   {
     $this->username = $username;
@@ -811,13 +806,6 @@ class sip
         $this->call_id = trim($m[1]);
       }
     }
-    //RTSP information
-    $this->rtsp = $this->parseRtsp();
-  }
-  private function parseRtsp(){
-    $rtsp=substr($this->rx_msg,stripos($this->rx_msg,"Content-Length"));
-    $rtsp=substr($rtsp,stripos($rtsp,"\n")+1);
-    return $rtsp;
   }
   public function reply($code, $text)
   {
