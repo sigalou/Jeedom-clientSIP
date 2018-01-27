@@ -40,7 +40,7 @@ $eqLogics = eqLogic::byType('clientSIP');
 			    	<span style="font-size : 1.1em;position:relative; top : 15px;word-break: break-all;white-space: pre-wrap;word-wrap: break-word;color:#767676"><center>Configuration</center></span>
 			</div>
 		</div>
-        <legend>{{Mes equipement virtuel}}</legend>
+        <legend>{{Mes comptes SIP}}</legend>
 		<div class="eqLogicThumbnailContainer">
 			<?php
 			if (count($eqLogics) == 0) {
